@@ -26,7 +26,7 @@ public class ApiDocumentationConfig {
 
     @Bean
     public GroupedOpenApi chatOpenApi() {
-        String[] paths = {"api/v1/**"};
+        String[] paths = {"/api/v1/**"};
 
         return GroupedOpenApi.builder()
                 .group("New Match42 API v1")
