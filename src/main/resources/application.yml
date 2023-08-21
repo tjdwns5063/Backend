@@ -1,6 +1,6 @@
 # server
 server:
-  port: 4242
+  port: 80
   servlet:
     session:
       timeout: 600
