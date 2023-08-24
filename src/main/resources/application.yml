@@ -1,7 +1,7 @@
 # 기본 설정은 local
-spring.profile.active: local
+spring.profiles.active: local
 
-# 공통 데이터
+##### 공통 설정 #####
 server:
   servlet:
     session:
@@ -15,6 +15,23 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
+  security:
+    oauth2:
+      client:
+        registration:
+          new_match42:
+            client-id: ${OAUTH_UID}
+            client-secret: ${OAUTH_SECRET}
+            scope: public
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost/login/oauth2/code/new_match42"
+
+        provider:
+          new_match42:
+            authorization-uri: https://api.intra.42.fr/oauth/authorize
+            token-uri: https://api.intra.42.fr/oauth/token
+            user-info-uri: https://api.intra.42.fr/v2/me
+            user-name-attribute: login
 
 jpa:
   open-in-view: false
@@ -30,8 +47,15 @@ security:
     name: minskim2
     roles: USER, ADMIN
 
+OAuth:
+  uid: ${OAUTH_UID}
+  secret: ${OAUTH_SECRET}
+
+
+
+
 ---
-# local 환경 설정
+##### local 환경 설정 #####
 spring.config.activate.on-profile: local
 
 server:
@@ -45,8 +69,10 @@ spring:
   security:
     user:
       password: 1234
+
+
 ---
-# prod 환경 설정
+##### 실제 NCP 서버용 환경 설정 #####
 spring.config.activate.on-profile: prod
 
 server:
@@ -60,6 +86,8 @@ spring:
   security:
     user:
       password: ${SPRING_SECURITY_PASSWORD} # 1234
+
+
 
 ---
 
