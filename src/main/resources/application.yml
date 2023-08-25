@@ -1,4 +1,4 @@
-# 기본 설정은 local
+# 기본 설정은 local 프로필로 작동합니다.
 spring.profiles.active: local
 
 ##### 공통 설정 #####
@@ -8,21 +8,30 @@ server:
       timeout: 600
       tracking-modes: cookie
     # ResponseStatusException message
-    error:
-      include-message: always
+  error:
+    include-message: always
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
   security:
+    user:
+      name: minskim2
+      roles: USER, ADMIN
     oauth2:
       client:
         registration:
           new_match42:
             client-id: ${OAUTH_UID}
             client-secret: ${OAUTH_SECRET}
-            scope: public
+            scope:
+              - public
+              - projects
+              - profile
+              - elearning
+              - tig
+              - forum
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
@@ -33,19 +42,13 @@ spring:
             user-info-uri: https://api.intra.42.fr/v2/me
             user-name-attribute: login
 
-jpa:
-  open-in-view: false
-  generate-ddl: true
-  show-sql: true
-  defer-datasource-initialization: true
-  # this option is dangerous
-  hibernate.ddl-auto: create-drop
-
-# Spring Security
-security:
-  user:
-    name: minskim2
-    roles: USER, ADMIN
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    show-sql: true
+    defer-datasource-initialization: true
+    # this option is dangerous
+    hibernate.ddl-auto: create-drop
 
 OAuth:
   uid: ${OAUTH_UID}
@@ -55,7 +58,8 @@ OAuth:
 
 
 ---
-##### local 환경 설정 #####
+
+##### 개발할 때 사용하는 local 환경 설정 프로필 #####
 spring.config.activate.on-profile: local
 
 server:
@@ -72,7 +76,8 @@ spring:
 
 
 ---
-##### 실제 NCP 서버용 환경 설정 #####
+
+##### 실제 NCP 서버용 환경 설정 프로필 #####
 spring.config.activate.on-profile: prod
 
 server:

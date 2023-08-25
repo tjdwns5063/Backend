@@ -24,28 +24,14 @@ public class LoginController {
     private String serverIp;
     @Value("${server.port}")
     private String serverPort;
-//    private final OAuth2Service oAuth2Service;
 
-//    @Autowired
-//    public LoginController(OAuth2Service oAuth2Service) {
-//        this.oAuth2Service = oAuth2Service;
-//    }
-
-//    @GetMapping("/oauth2/code")
-//    @Operation(summary = "Redirect URL", description = "42 로그인 후 리다이렉트 처리 API", responses = {
-//            @ApiResponse(responseCode = "301", description = "로그인 처리 완료")
-//    })
-//    public ResponseEntity<?> redirectURL(@RequestParam("code") String code) {
-//        // 42 로그인 후 토큰 받아오기
-////        String token = oAuth2Service.getToken(code);
-//        String token = code;
-//        log.info("token: " + token);
-//        // todo: 토큰으로 유저 정보 받아오기
-//        // todo: 유저 정보로 DB에 저장하기
-//        // todo: 유저 정보로 JWT 토큰 생성하기
-//        // todo: JWT 토큰 전달
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Location", "http://" + serverIp + ":" + serverPort + "/api/v1/OAuth/login?token=" + token);
-//        return new ResponseEntity<>(code, headers, HttpStatus.MOVED_PERMANENTLY);
-//    }
+    @GetMapping("/")
+    @Operation(summary = "Login API", description = "42 로그인 후 JWT 반환", responses = {
+            @ApiResponse(responseCode = "200", description = "로그인 처리 완료")
+    })
+    public ResponseEntity<?> loginJWT() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Set-Cookie", "token=1234");
+        return new ResponseEntity<>("로그인 성공", headers, HttpStatus.OK);
+    }
 }
