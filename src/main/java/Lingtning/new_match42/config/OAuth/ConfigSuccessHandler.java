@@ -15,7 +15,7 @@ import java.io.IOException;
 @Slf4j
 public class ConfigSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.getWriter().write("로그인 성공");
         getRedirectStrategy().sendRedirect(request, response, "/login/success");
         log.info("로그인 성공");
