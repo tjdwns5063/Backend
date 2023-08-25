@@ -24,7 +24,7 @@ spring:
             client-secret: ${OAUTH_SECRET}
             scope: public
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost/login/oauth2/code/new_match42"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
         provider:
           new_match42:

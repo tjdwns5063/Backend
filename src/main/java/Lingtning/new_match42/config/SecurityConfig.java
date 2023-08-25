@@ -48,12 +48,10 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(new OAuth2Service())) // 유저 정보 가져오기
-                        .successHandler(new ConfigSuccessHandler()) // 로그인 성공 시 처리
-                        .failureHandler(new ConfigFailureHandler()) // 로그인 실패 시 처리
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/api/v1/user/logout")
+                        .logoutUrl("/api/v1/user/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()

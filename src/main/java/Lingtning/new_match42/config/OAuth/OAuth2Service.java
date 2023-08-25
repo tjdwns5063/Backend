@@ -20,6 +20,8 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         Assert.notNull(userRequest, "userRequest cannot be null");
         OAuth2User user = super.loadUser(userRequest);
 
+        log.info("OAuth Login: {}", userRequest.getClientRegistration().getRegistrationId());
+
         return OAuth2FTUser.builder()
                 .user(User.builder()
                         .intra(user.getAttribute("login"))
