@@ -28,7 +28,7 @@ public class ConfigSuccessHandler extends SavedRequestAwareAuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.getWriter().write("로그인 성공");
         String token = jwtTokenProvider.createToken(authentication.getName(), Role.USER);
-        getRedirectStrategy().sendRedirect(request, response, "/api/v1/login?token=" + token);
+        getRedirectStrategy().sendRedirect(request, response, "/api/v1/login/success?token=" + token);
         log.info("로그인 성공");
     }
 }

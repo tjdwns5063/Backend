@@ -30,14 +30,15 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-resources/**",
+            // oauth2
+            "/oauth2/**",
+            "/login/oauth2/**",
             // login
-            "/api/v1/login",
             "/login/failure",
-            "/login/oauth2/code/**",
+            "/api/v1/login/success",
             // logout
             "/api/v1/logout",
-            // api
-//            "/api/v1/**"  // 일단 지금은 api 호출에 인증이 필요 없도록 설정
+            // error
             "/error"
     };
     private final String[] USER_ACCESS_LIST = {
