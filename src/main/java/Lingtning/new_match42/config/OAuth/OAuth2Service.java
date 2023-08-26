@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.nio.file.attribute.UserPrincipal;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,14 +30,17 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         Assert.notNull(userRequest, "userRequest cannot be null");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        log.info("OAuth Login: {}", userRequest.getClientRegistration().getRegistrationId());
+        String intra = oAuth2User.getAttribute("login");
+        log.info("OAuth Login: {}", intra);
 
-        User user = userRepository.findByIntra(oAuth2User.getAttribute("login")).orElse(
-                userRepository.save(User.builder()
-                        .intra(oAuth2User.getAttribute("login"))
-                        .email(oAuth2User.getAttribute("email"))
-                        .role(Role.USER)
-                        .build()));
+        User user = userRepository.findByIntra(oAuth2User.getAttribute("login")).orElse(null);
+        if (user == null) {
+            userRepository.save(User.builder()
+            .intra(oAuth2User.getAttribute("login"))
+            .email(oAuth2User.getAttribute("email"))
+            .role(Role.USER)
+            .build());
+        }
 
 
         return OAuth2FTUser.builder()

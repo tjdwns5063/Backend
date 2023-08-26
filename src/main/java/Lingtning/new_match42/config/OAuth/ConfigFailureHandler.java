@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 @Slf4j
+@Component
 public class ConfigFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
