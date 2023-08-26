@@ -3,6 +3,8 @@ package Lingtning.new_match42.config;
 import Lingtning.new_match42.config.OAuth.ConfigFailureHandler;
 import Lingtning.new_match42.config.OAuth.ConfigSuccessHandler;
 import Lingtning.new_match42.config.OAuth.OAuth2Service;
+import Lingtning.new_match42.config.jwt.JwtAuthenticationFilter;
+import Lingtning.new_match42.config.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,13 +12,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // spring security 설정 파일 입니다.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final OAuth2Service oAuth2Service;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final ConfigSuccessHandler configSuccessHandler;
+    private final ConfigFailureHandler configFailureHandler;
 
     private final String[] WHITE_LIST = {
             // swagger
@@ -24,8 +31,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-resources/**",
             // login
-            "/login",
-            "/login/success",
+            "/api/v1/login",
             "/login/failure",
             "/login/oauth2/code/**",
             // logout
@@ -35,15 +41,18 @@ public class SecurityConfig {
             "/error"
     };
     private final String[] USER_ACCESS_LIST = {
-            "/api/v1/user/**"
+            "/api/v1/**"
     };
     private final String[] ADMIN_ACCESS_LIST = {
             "/api/v1/admin/**"
     };
 
     @Autowired
-    public SecurityConfig(OAuth2Service oAuth2Service) {
+    public SecurityConfig(OAuth2Service oAuth2Service, JwtTokenProvider jwtTokenProvider, ConfigSuccessHandler configSuccessHandler, ConfigFailureHandler configFailureHandler) {
         this.oAuth2Service = oAuth2Service;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.configSuccessHandler = configSuccessHandler;
+        this.configFailureHandler = configFailureHandler;
     }
 
     @Bean
@@ -63,8 +72,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2Service)) // 유저 정보 가져오기
-                        .successHandler(new ConfigSuccessHandler()) // 로그인 성공
-                        .failureHandler(new ConfigFailureHandler()) // 로그인 실패
+                        .successHandler(configSuccessHandler) // 로그인 성공
+                        .failureHandler(configFailureHandler) // 로그인 실패
                         .permitAll()
                 )
                 // 로그아웃
@@ -74,9 +83,11 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
                 .csrf(AbstractHttpConfigurer::disable); // csrf 비활성화
 
-//        http.addFilterBefore() todo: jwt 필터 추가
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
