@@ -35,12 +35,50 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
+    @Column
+    private String interest1;
+    @Column
+    private String interest2;
+    @Column
+    private String interest3;
+    @Column
+    private String interest4;
+    @Column
+    private String interest5;
+    @Column(nullable = false)
+    private Integer interestCount;
+
+    @Column
+    private String blockUser1;
+    @Column
+    private String blockUser2;
+    @Column
+    private String blockUser3;
+    @Column
+    private String blockUser4;
+    @Column
+    private String blockUser5;
+    @Column(nullable = false)
+    private Integer blockCount;
+
     @Builder
-    public User(Long id, String email, String intra, Role role) {
+    public User(Long id, String email, String intra, Role role, String interest1, String interest2, String interest3, String interest4, String interest5, Integer interestCount, String blockUser1, String blockUser2, String blockUser3, String blockUser4, String blockUser5, Integer blockCount) {
         this.id = id;
         this.email = email;
         this.intra = intra;
         this.role = role;
+        this.interest1 = interest1;
+        this.interest2 = interest2;
+        this.interest3 = interest3;
+        this.interest4 = interest4;
+        this.interest5 = interest5;
+        this.interestCount = interestCount;
+        this.blockUser1 = blockUser1;
+        this.blockUser2 = blockUser2;
+        this.blockUser3 = blockUser3;
+        this.blockUser4 = blockUser4;
+        this.blockUser5 = blockUser5;
+        this.blockCount = blockCount;
     }
 
     @Override

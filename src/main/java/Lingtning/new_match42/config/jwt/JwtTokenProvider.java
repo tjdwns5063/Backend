@@ -33,7 +33,7 @@ public class JwtTokenProvider {
     // 토큰 유효시간 30분
     private static final long tokenValidTime = 30 * 60 * 1000L;
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
@@ -71,9 +71,13 @@ public class JwtTokenProvider {
     }
 
 //    // 토큰의 유효성 + 만료일자 확인
-    public boolean validateToken(String jwtToken) {
+    public boolean validateToken(String token) {
+        if (token == null || !token.contains("Bearer ")) {
+            return false;
+        }
+        String jwt = token.replace("Bearer ", "");
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(jwt);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
