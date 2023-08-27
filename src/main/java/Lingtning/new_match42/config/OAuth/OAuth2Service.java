@@ -39,6 +39,8 @@ public class OAuth2Service extends DefaultOAuth2UserService {
             .intra(oAuth2User.getAttribute("login"))
             .email(oAuth2User.getAttribute("email"))
             .role(Role.USER)
+            .interestCount(0)
+            .blockCount(0)
             .build());
         }
 
