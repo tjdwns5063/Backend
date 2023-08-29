@@ -39,12 +39,12 @@ public class UserController {
         return userService.getInterests(userId);
     }
 
-    @PostMapping("/interest")
+    @PutMapping("/interest")
     @Operation(summary = "관심사 추가 API", description = "관심사 추가 API", responses = {
             @ApiResponse(responseCode = "200", description = "관심사 추가 완료")
     })
-    public UserResponse addInterest(Authentication authentication, @RequestBody List<String> interests) {
-        return userService.addInterest(authentication, interests);
+    public UserResponse putInterest(Authentication authentication, @RequestBody List<String> interests) {
+        return userService.putInterest(authentication, interests);
     }
 
     @DeleteMapping("/interest")

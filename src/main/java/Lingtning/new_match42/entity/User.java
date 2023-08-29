@@ -37,9 +37,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<UserConnectInterest> userConnectInterest;
 
-    @Column(nullable = false)
-    private Long interestCount;
-
     @OneToMany(mappedBy = "user")
     private List<UserConnectBlockUser> userConnectBlockUser;
 
@@ -47,13 +44,12 @@ public class User implements UserDetails {
     private Long blockCount;
 
     @Builder
-    public User(Long id, String email, String intra, Role role, List<UserConnectInterest> userConnectInterest, Long interestCount, List<UserConnectBlockUser> userConnectBlockUser, Long blockCount) {
+    public User(Long id, String email, String intra, Role role, List<UserConnectInterest> userConnectInterest, List<UserConnectBlockUser> userConnectBlockUser, Long blockCount) {
         this.id = id;
         this.email = email;
         this.intra = intra;
         this.role = role;
         this.userConnectInterest = userConnectInterest;
-        this.interestCount = interestCount;
         this.userConnectBlockUser = userConnectBlockUser;
         this.blockCount = blockCount;
     }

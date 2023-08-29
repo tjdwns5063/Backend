@@ -67,7 +67,6 @@ public class UserService {
                 .intra(user.getIntra())
                 .email(user.getEmail())
                 .interests(interestList)
-                .interestCount(user.getInterestCount())
                 .blockUsers(blockUserList)
                 .blockCount(user.getBlockCount())
                 .role(user.getRole())
@@ -80,17 +79,15 @@ public class UserService {
         return getUserResponse(userMe);
     }
 
-    public UserResponse addInterest(Authentication authentication, List<String> interests) {
+    public UserResponse putInterest(Authentication authentication, List<String> interests) {
         User userMe = getUser(authentication);
-        List<UserConnectInterest> connectInterestList = userMe.getUserConnectInterest();
-        Long interestCount = userMe.getInterestCount();
-
-        if (userMe.getInterestCount() == 5) {
+        userConnectInterestRepository.deleteAll(userMe.getUserConnectInterest());
+        if (interests.size() >= 5) {
             throw new ResponseStatusException(BAD_REQUEST, "관심사는 최대 5개까지 설정할 수 있습니다.");
         }
+        List<UserConnectInterest> connectInterestList = new ArrayList<>();
 
         for (String interest : interests) {
-            boolean isExist = false;
             Interest findInterest = interestRepository.findByKeyword(interest).orElse(null);
             if (findInterest == null) {
                 findInterest = interestRepository.save(
@@ -98,29 +95,16 @@ public class UserService {
                     .keyword(interest)
                     .build());
             }
-
-            for (UserConnectInterest connectInterest : connectInterestList) {
-                if (connectInterest.getInterest().getKeyword().equals(interest)) {
-                    isExist = true;
-                    break;
-                }
-            }
-            if (isExist) {
-                continue;
-            }
             UserConnectInterest userConnectInterest = UserConnectInterest.builder()
                 .user(userMe)
                 .interest(findInterest)
                 .build();
             userConnectInterestRepository.save(userConnectInterest);
-            interestCount++;
             connectInterestList.add(userConnectInterest);
             log.info("interest: " + interest);
         }
 
-        userMe.setInterestCount(userMe.getInterestCount() + interests.size());
         userMe.setUserConnectInterest(connectInterestList);
-        userMe.setInterestCount(interestCount);
 
         userRepository.save(userMe);
 
@@ -134,7 +118,6 @@ public class UserService {
         for (UserConnectInterest connectInterest : connectInterestList) {
             if (connectInterest.getInterest().getKeyword().equals(interest)) {
                 userConnectInterestRepository.delete(connectInterest);
-                userMe.setInterestCount(userMe.getInterestCount() - 1);
                 userRepository.save(userMe);
                 return getUserResponse(userMe);
             }
