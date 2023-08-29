@@ -7,6 +7,9 @@ server:
     session:
       timeout: 600
       tracking-modes: cookie
+    encoding:
+      charset: UTF-8
+      force: true
     # ResponseStatusException message
   error:
     include-message: always
