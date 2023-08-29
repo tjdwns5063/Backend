@@ -17,8 +17,8 @@ public class UserResponse {
     private Role role;
 
     private List<String> interests;
-    private Integer interestCount;
+    private Long interestCount;
 
     private List<String> blockUsers;
-    private Integer blockCount;
+    private Long blockCount;
 }

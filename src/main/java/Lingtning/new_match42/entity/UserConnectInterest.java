@@ -1,10 +1,7 @@
 package Lingtning.new_match42.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -15,17 +12,18 @@ import static lombok.AccessLevel.PUBLIC;
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
+@ToString
 public class UserConnectInterest {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "user_connect_interest_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interest_id")
+    @JoinColumn(name = "interest", nullable = false)
     private Interest interest;
 
     @Builder

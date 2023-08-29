@@ -6,8 +6,12 @@ import Lingtning.new_match42.entity.Interest;
 import Lingtning.new_match42.entity.User;
 import Lingtning.new_match42.entity.UserConnectBlockUser;
 import Lingtning.new_match42.entity.UserConnectInterest;
+import Lingtning.new_match42.repository.InterestRepository;
+import Lingtning.new_match42.repository.UserConnectBlockUserRepository;
+import Lingtning.new_match42.repository.UserConnectInterestRepository;
 import Lingtning.new_match42.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,13 +22,20 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+@Slf4j(topic = "UserService")
 @Service
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final InterestRepository interestRepository;
+    private final UserConnectInterestRepository userConnectInterestRepository;
+    private final UserConnectBlockUserRepository userConnectBlockUserRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, InterestRepository interestRepository, UserConnectInterestRepository userConnectInterestRepository, UserConnectBlockUserRepository userConnectBlockUserRepository) {
         this.userRepository = userRepository;
+        this.interestRepository = interestRepository;
+        this.userConnectInterestRepository = userConnectInterestRepository;
+        this.userConnectBlockUserRepository = userConnectBlockUserRepository;
     }
 
     private String getIntra(Authentication authentication) {
@@ -42,10 +53,19 @@ public class UserService {
         List<String> interestList = new ArrayList<>();
         List<String> blockUserList = new ArrayList<>();
 
-        for (UserConnectInterest connectInterest : user.getUserConnectInterest()) {
+        List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
+        for (UserConnectInterest connectInterest : connectInterestList) {
+//            if (connectInterest.getInterest() == null) {
+//                continue;
+//            }
             interestList.add(connectInterest.getInterest().getKeyword());
         }
-        for (UserConnectBlockUser connectBlockUser : user.getUserConnectBlockUser()) {
+
+        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
+        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+//            if (connectBlockUser.getBlockUser() == null) {
+//                continue;
+//            }
             blockUserList.add(connectBlockUser.getBlockUser().getIntra());
         }
         return UserResponse.builder()
@@ -66,9 +86,10 @@ public class UserService {
         return getUserResponse(userMe);
     }
 
-    public UserResponse addInterests(Authentication authentication, List<String> interests) {
+    public UserResponse addInterest(Authentication authentication, List<String> interests) {
         User userMe = getUser(authentication);
         List<UserConnectInterest> connectInterestList = userMe.getUserConnectInterest();
+        Long interestCount = userMe.getInterestCount();
 
         if (userMe.getInterestCount() == 5) {
             throw new ResponseStatusException(BAD_REQUEST, "관심사는 최대 5개까지 설정할 수 있습니다.");
@@ -76,6 +97,10 @@ public class UserService {
 
         for (String interest : interests) {
             boolean isExist = false;
+            Interest findInterest = interestRepository.findByKeyword(interest).orElse(interestRepository.save(
+                    Interest.builder()
+                    .keyword(interest)
+                    .build()));
 
             for (UserConnectInterest connectInterest : connectInterestList) {
                 if (connectInterest.getInterest().getKeyword().equals(interest)) {
@@ -86,16 +111,19 @@ public class UserService {
             if (isExist) {
                 continue;
             }
-            connectInterestList.add(UserConnectInterest.builder()
+            UserConnectInterest userConnectInterest = UserConnectInterest.builder()
                     .user(userMe)
-                    .interest(Interest.builder()
-                            .keyword(interest)
-                            .build())
-                    .build());
+                    .interest(findInterest)
+                    .build();
+            userConnectInterestRepository.save(userConnectInterest);
+            interestCount++;
+            connectInterestList.add(userConnectInterest);
+            log.info("interest: " + interest);
         }
 
+        userMe.setInterestCount(userMe.getInterestCount() + interests.size());
         userMe.setUserConnectInterest(connectInterestList);
-        userMe.setInterestCount(userMe.getInterestCount() + 1);
+        userMe.setInterestCount(interestCount);
 
         userRepository.save(userMe);
 
@@ -108,8 +136,7 @@ public class UserService {
 
         for (UserConnectInterest connectInterest : connectInterestList) {
             if (connectInterest.getInterest().getKeyword().equals(interest)) {
-                connectInterestList.remove(connectInterest);
-                userMe.setUserConnectInterest(connectInterestList);
+                userConnectInterestRepository.delete(connectInterest);
                 userMe.setInterestCount(userMe.getInterestCount() - 1);
                 userRepository.save(userMe);
                 return getUserResponse(userMe);
@@ -133,16 +160,17 @@ public class UserService {
             throw new ResponseStatusException(BAD_REQUEST, "차단할 수 있는 유저는 최대 5명까지입니다.");
         }
 
-        connectBlockUserList.add(UserConnectBlockUser.builder()
-                .user(userMe)
-                .blockUser(User.builder()
-                        .intra(blockUser)
-                        .build())
-                .build());
+        User findBlockUser = userRepository.findByIntra(blockUser).orElseThrow(()
+                -> new ResponseStatusException(NOT_FOUND, "차단할 유저를 찾을 수 없습니다."));
 
-        userMe.setUserConnectBlockUser(connectBlockUserList);
+        UserConnectBlockUser connectBlockUser = UserConnectBlockUser
+            .builder()
+            .user(userMe)
+            .blockUser(findBlockUser)
+            .build();
         userMe.setBlockCount(userMe.getBlockCount() + 1);
 
+        userConnectBlockUserRepository.save(connectBlockUser);
         userRepository.save(userMe);
 
         return getUserResponse(userMe);
@@ -153,9 +181,11 @@ public class UserService {
         List<UserConnectBlockUser> connectBlockUserList = userMe.getUserConnectBlockUser();
 
         for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+            if (connectBlockUser.getBlockUser() == null) {
+                continue;
+            }
             if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
-                connectBlockUserList.remove(connectBlockUser);
-                userMe.setUserConnectBlockUser(connectBlockUserList);
+                userConnectBlockUserRepository.delete(connectBlockUser);
                 userMe.setBlockCount(userMe.getBlockCount() - 1);
                 userRepository.save(userMe);
                 return getUserResponse(userMe);
@@ -170,8 +200,9 @@ public class UserService {
                 -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
 
         List<String> interestList = new ArrayList<>();
+        List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
 
-        for (UserConnectInterest connectInterest : user.getUserConnectInterest()) {
+        for (UserConnectInterest connectInterest : connectInterestList) {
             interestList.add(connectInterest.getInterest().getKeyword());
         }
 

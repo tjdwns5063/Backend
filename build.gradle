@@ -43,6 +43,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+
 }
 
 tasks.named('test') {

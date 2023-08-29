@@ -43,8 +43,8 @@ public class UserController {
     @Operation(summary = "관심사 추가 API", description = "관심사 추가 API", responses = {
             @ApiResponse(responseCode = "200", description = "관심사 추가 완료")
     })
-    public UserResponse addInterests(Authentication authentication, @RequestBody List<String> interests) {
-        return userService.addInterests(authentication, interests);
+    public UserResponse addInterest(Authentication authentication, @RequestBody List<String> interests) {
+        return userService.addInterest(authentication, interests);
     }
 
     @DeleteMapping("/interest")
