@@ -82,7 +82,7 @@ public class UserService {
     public UserResponse putInterest(Authentication authentication, List<String> interests) {
         User userMe = getUser(authentication);
         userConnectInterestRepository.deleteAll(userMe.getUserConnectInterest());
-        if (interests.size() >= 5) {
+        if (interests.size() > 5) {
             throw new ResponseStatusException(BAD_REQUEST, "관심사는 최대 5개까지 설정할 수 있습니다.");
         }
         List<UserConnectInterest> connectInterestList = new ArrayList<>();
