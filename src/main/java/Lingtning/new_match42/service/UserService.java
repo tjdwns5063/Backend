@@ -55,17 +55,11 @@ public class UserService {
 
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
         for (UserConnectInterest connectInterest : connectInterestList) {
-//            if (connectInterest.getInterest() == null) {
-//                continue;
-//            }
             interestList.add(connectInterest.getInterest().getKeyword());
         }
 
         List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
         for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-//            if (connectBlockUser.getBlockUser() == null) {
-//                continue;
-//            }
             blockUserList.add(connectBlockUser.getBlockUser().getIntra());
         }
         return UserResponse.builder()
@@ -97,10 +91,13 @@ public class UserService {
 
         for (String interest : interests) {
             boolean isExist = false;
-            Interest findInterest = interestRepository.findByKeyword(interest).orElse(interestRepository.save(
+            Interest findInterest = interestRepository.findByKeyword(interest).orElse(null);
+            if (findInterest == null) {
+                findInterest = interestRepository.save(
                     Interest.builder()
                     .keyword(interest)
-                    .build()));
+                    .build());
+            }
 
             for (UserConnectInterest connectInterest : connectInterestList) {
                 if (connectInterest.getInterest().getKeyword().equals(interest)) {
@@ -112,9 +109,9 @@ public class UserService {
                 continue;
             }
             UserConnectInterest userConnectInterest = UserConnectInterest.builder()
-                    .user(userMe)
-                    .interest(findInterest)
-                    .build();
+                .user(userMe)
+                .interest(findInterest)
+                .build();
             userConnectInterestRepository.save(userConnectInterest);
             interestCount++;
             connectInterestList.add(userConnectInterest);
