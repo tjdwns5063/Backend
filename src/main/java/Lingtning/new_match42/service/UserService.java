@@ -1,17 +1,25 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.dto.UserResponseDto;
+import Lingtning.new_match42.dto.UserInterestResponse;
+import Lingtning.new_match42.dto.UserResponse;
+import Lingtning.new_match42.entity.Interest;
 import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.entity.UserConnectBlockUser;
+import Lingtning.new_match42.entity.UserConnectInterest;
 import Lingtning.new_match42.repository.UserRepository;
-import io.jsonwebtoken.Claims;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
 
@@ -24,142 +32,153 @@ public class UserService {
         return user.getIntra();
     }
 
-    private User getUser(Authentication authentication) {
+    public User getUser(Authentication authentication) {
         String intra = getIntra(authentication);
         return userRepository.findByIntra(intra).orElseThrow(()
                 -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
     }
 
-    private UserResponseDto getUserResponseDto(User user) {
-        return UserResponseDto.builder()
+    public UserResponse getUserResponse(User user) {
+        List<String> interestList = new ArrayList<>();
+        List<String> blockUserList = new ArrayList<>();
+
+        for (UserConnectInterest connectInterest : user.getUserConnectInterest()) {
+            interestList.add(connectInterest.getInterest().getKeyword());
+        }
+        for (UserConnectBlockUser connectBlockUser : user.getUserConnectBlockUser()) {
+            blockUserList.add(connectBlockUser.getBlockUser().getIntra());
+        }
+        return UserResponse.builder()
                 .id(user.getId())
                 .intra(user.getIntra())
                 .email(user.getEmail())
-                .blockUser1(user.getBlockUser1())
-                .blockUser2(user.getBlockUser2())
-                .blockUser3(user.getBlockUser3())
-                .blockUser4(user.getBlockUser4())
-                .blockUser5(user.getBlockUser5())
-                .blockCount(user.getBlockCount())
-                .interest1(user.getInterest1())
-                .interest2(user.getInterest2())
-                .interest3(user.getInterest3())
-                .interest4(user.getInterest4())
-                .interest5(user.getInterest5())
+                .interests(interestList)
                 .interestCount(user.getInterestCount())
+                .blockUsers(blockUserList)
+                .blockCount(user.getBlockCount())
                 .role(user.getRole())
                 .build();
     }
 
-    public UserResponseDto getMe(Authentication authentication) {
-        User user = getUser(authentication);
+    public UserResponse getMe(Authentication authentication) {
+        User userMe = getUser(authentication);
 
-        return getUserResponseDto(user);
+        return getUserResponse(userMe);
     }
 
-    public UserResponseDto addInterest(Authentication authentication, String interest) {
-        User user = getUser(authentication);
-        String[] arrayInterest = {user.getInterest1(), user.getInterest2(), user.getInterest3(), user.getInterest4(), user.getInterest5()};
+    public UserResponse addInterests(Authentication authentication, List<String> interests) {
+        User userMe = getUser(authentication);
+        List<UserConnectInterest> connectInterestList = userMe.getUserConnectInterest();
 
-        for (String str : arrayInterest) {
-            if (str != null && str.equals(interest)) {
-                throw new ResponseStatusException(BAD_REQUEST, "이미 추가된 관심사입니다.");
-            }
-        }
-
-        if (user.getInterest1() == null) {
-            user.setInterest1(interest);
-        } else if (user.getInterest2() == null) {
-            user.setInterest2(interest);
-        } else if (user.getInterest3() == null) {
-            user.setInterest3(interest);
-        } else if (user.getInterest4() == null) {
-            user.setInterest4(interest);
-        } else if (user.getInterest5() == null) {
-            user.setInterest5(interest);
-        } else {
+        if (userMe.getInterestCount() == 5) {
             throw new ResponseStatusException(BAD_REQUEST, "관심사는 최대 5개까지 설정할 수 있습니다.");
         }
 
-        user.setInterestCount(user.getInterestCount() + 1);
-        userRepository.save(user);
+        for (String interest : interests) {
+            boolean isExist = false;
 
-        return getUserResponseDto(user);
-    }
-
-    public UserResponseDto deleteInterest(Authentication authentication, String interest) {
-        User user = getUser(authentication);
-
-        if (user.getInterest1() != null && user.getInterest1().equals(interest)) {
-            user.setInterest1(null);
-        } else if (user.getInterest2() != null && user.getInterest2().equals(interest)) {
-            user.setInterest2(null);
-        } else if (user.getInterest3() != null && user.getInterest3().equals(interest)) {
-            user.setInterest3(null);
-        } else if (user.getInterest4() != null && user.getInterest4().equals(interest)) {
-            user.setInterest4(null);
-        } else if (user.getInterest5() != null && user.getInterest5().equals(interest)) {
-            user.setInterest5(null);
-        } else {
-            throw new ResponseStatusException(NOT_FOUND, "해당 관심사가 없습니다.");
+            for (UserConnectInterest connectInterest : connectInterestList) {
+                if (connectInterest.getInterest().getKeyword().equals(interest)) {
+                    isExist = true;
+                    break;
+                }
+            }
+            if (isExist) {
+                continue;
+            }
+            connectInterestList.add(UserConnectInterest.builder()
+                    .user(userMe)
+                    .interest(Interest.builder()
+                            .keyword(interest)
+                            .build())
+                    .build());
         }
 
-        user.setInterestCount(user.getInterestCount() - 1);
-        userRepository.save(user);
+        userMe.setUserConnectInterest(connectInterestList);
+        userMe.setInterestCount(userMe.getInterestCount() + 1);
 
-        return getUserResponseDto(user);
+        userRepository.save(userMe);
+
+        return getUserResponse(userMe);
     }
 
-    public UserResponseDto addBlockUser(Authentication authentication, String blockUser) {
-        User user = getUser(authentication);
-        String[] arrayBlockUser = {user.getBlockUser1(), user.getBlockUser2(), user.getBlockUser3(), user.getBlockUser4(), user.getBlockUser5()};
+    public UserResponse deleteInterest(Authentication authentication, String interest) {
+        User userMe = getUser(authentication);
+        List<UserConnectInterest> connectInterestList = userMe.getUserConnectInterest();
 
-        for (String str : arrayBlockUser) {
-            if (str != null && str.equals(blockUser)) {
+        for (UserConnectInterest connectInterest : connectInterestList) {
+            if (connectInterest.getInterest().getKeyword().equals(interest)) {
+                connectInterestList.remove(connectInterest);
+                userMe.setUserConnectInterest(connectInterestList);
+                userMe.setInterestCount(userMe.getInterestCount() - 1);
+                userRepository.save(userMe);
+                return getUserResponse(userMe);
+            }
+        }
+
+        throw new ResponseStatusException(NOT_FOUND, "해당 관심사가 없습니다.");
+    }
+
+    public UserResponse addBlockUser(Authentication authentication, String blockUser) {
+        User userMe = getUser(authentication);
+        List<UserConnectBlockUser> connectBlockUserList = userMe.getUserConnectBlockUser();
+
+        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
                 throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
             }
         }
 
-        if (user.getBlockUser1() == null) {
-            user.setBlockUser1(blockUser);
-        } else if (user.getBlockUser2() == null) {
-            user.setBlockUser2(blockUser);
-        } else if (user.getBlockUser3() == null) {
-            user.setBlockUser3(blockUser);
-        } else if (user.getBlockUser4() == null) {
-            user.setBlockUser4(blockUser);
-        } else if (user.getBlockUser5() == null) {
-            user.setBlockUser5(blockUser);
-        } else {
+        if (userMe.getBlockCount() == 5) {
             throw new ResponseStatusException(BAD_REQUEST, "차단할 수 있는 유저는 최대 5명까지입니다.");
         }
 
-        user.setBlockCount(user.getBlockCount() + 1);
-        userRepository.save(user);
+        connectBlockUserList.add(UserConnectBlockUser.builder()
+                .user(userMe)
+                .blockUser(User.builder()
+                        .intra(blockUser)
+                        .build())
+                .build());
 
-        return getUserResponseDto(user);
+        userMe.setUserConnectBlockUser(connectBlockUserList);
+        userMe.setBlockCount(userMe.getBlockCount() + 1);
+
+        userRepository.save(userMe);
+
+        return getUserResponse(userMe);
     }
 
-    public UserResponseDto deleteBlockUser(Authentication authentication, String blockUser) {
-        User user = getUser(authentication);
+    public UserResponse deleteBlockUser(Authentication authentication, String blockUser) {
+        User userMe = getUser(authentication);
+        List<UserConnectBlockUser> connectBlockUserList = userMe.getUserConnectBlockUser();
 
-        if (user.getBlockUser1() != null && user.getBlockUser1().equals(blockUser)) {
-            user.setBlockUser1(null);
-        } else if (user.getBlockUser2() != null && user.getBlockUser2().equals(blockUser)) {
-            user.setBlockUser2(null);
-        } else if (user.getBlockUser3() != null && user.getBlockUser3().equals(blockUser)) {
-            user.setBlockUser3(null);
-        } else if (user.getBlockUser4() != null && user.getBlockUser4().equals(blockUser)) {
-            user.setBlockUser4(null);
-        } else if (user.getBlockUser5() != null && user.getBlockUser5().equals(blockUser)) {
-            user.setBlockUser5(null);
-        } else {
-            throw new ResponseStatusException(NOT_FOUND, "해당 유저를 차단하고 있지 않습니다.");
+        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
+                connectBlockUserList.remove(connectBlockUser);
+                userMe.setUserConnectBlockUser(connectBlockUserList);
+                userMe.setBlockCount(userMe.getBlockCount() - 1);
+                userRepository.save(userMe);
+                return getUserResponse(userMe);
+            }
         }
 
-        user.setBlockCount(user.getBlockCount() - 1);
-        userRepository.save(user);
+        throw new ResponseStatusException(NOT_FOUND, "해당 유저를 차단하고 있지 않습니다.");
+    }
 
-        return getUserResponseDto(user);
+    public UserInterestResponse getInterests(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
+
+        List<String> interestList = new ArrayList<>();
+
+        for (UserConnectInterest connectInterest : user.getUserConnectInterest()) {
+            interestList.add(connectInterest.getInterest().getKeyword());
+        }
+
+        return UserInterestResponse.builder()
+                .id(user.getId())
+                .intra(user.getIntra())
+                .interests(interestList)
+                .build();
     }
 }
