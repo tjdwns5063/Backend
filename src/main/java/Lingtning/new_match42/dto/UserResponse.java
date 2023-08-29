@@ -5,26 +5,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
-public class UserResponseDto {
+public class UserResponse {
     private Long id;
     private String intra;
     private String email;
     private Role role;
 
-    private String interest1;
-    private String interest2;
-    private String interest3;
-    private String interest4;
-    private String interest5;
+    private List<String> interests;
     private Integer interestCount;
 
-    private String blockUser1;
-    private String blockUser2;
-    private String blockUser3;
-    private String blockUser4;
-    private String blockUser5;
+    private List<String> blockUsers;
     private Integer blockCount;
 }

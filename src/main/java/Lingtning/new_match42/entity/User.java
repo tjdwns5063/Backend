@@ -1,27 +1,26 @@
 package Lingtning.new_match42.entity;
 
-import com.fasterxml.jackson.databind.util.ClassUtil;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.core.CollectionFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Table(name = "user")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @ToString(of = {"id", "intra", "email", "role"})
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -35,49 +34,27 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @Column
-    private String interest1;
-    @Column
-    private String interest2;
-    @Column
-    private String interest3;
-    @Column
-    private String interest4;
-    @Column
-    private String interest5;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserConnectInterest> userConnectInterest;
+
     @Column(nullable = false)
     private Integer interestCount;
 
-    @Column
-    private String blockUser1;
-    @Column
-    private String blockUser2;
-    @Column
-    private String blockUser3;
-    @Column
-    private String blockUser4;
-    @Column
-    private String blockUser5;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserConnectBlockUser> userConnectBlockUser;
+
     @Column(nullable = false)
     private Integer blockCount;
 
     @Builder
-    public User(Long id, String email, String intra, Role role, String interest1, String interest2, String interest3, String interest4, String interest5, Integer interestCount, String blockUser1, String blockUser2, String blockUser3, String blockUser4, String blockUser5, Integer blockCount) {
+    public User(Long id, String email, String intra, Role role, List<UserConnectInterest> userConnectInterest, Integer interestCount, List<UserConnectBlockUser> userConnectBlockUser, Integer blockCount) {
         this.id = id;
         this.email = email;
         this.intra = intra;
         this.role = role;
-        this.interest1 = interest1;
-        this.interest2 = interest2;
-        this.interest3 = interest3;
-        this.interest4 = interest4;
-        this.interest5 = interest5;
+        this.userConnectInterest = userConnectInterest;
         this.interestCount = interestCount;
-        this.blockUser1 = blockUser1;
-        this.blockUser2 = blockUser2;
-        this.blockUser3 = blockUser3;
-        this.blockUser4 = blockUser4;
-        this.blockUser5 = blockUser5;
+        this.userConnectBlockUser = userConnectBlockUser;
         this.blockCount = blockCount;
     }
 
