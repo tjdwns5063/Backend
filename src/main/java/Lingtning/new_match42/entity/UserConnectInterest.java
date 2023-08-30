@@ -16,8 +16,8 @@ import static lombok.AccessLevel.PUBLIC;
 public class UserConnectInterest {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "user_connect_interest_id")
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user", nullable = false)
     private User user;

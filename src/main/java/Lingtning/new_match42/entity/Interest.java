@@ -1,10 +1,7 @@
 package Lingtning.new_match42.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,10 +13,10 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
+@ToString(exclude = "userConnectInterest")
 public class Interest {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "interest_id")
     private Long id;
 
     @Column(nullable = false, unique = true)

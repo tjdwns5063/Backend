@@ -1,5 +1,6 @@
 package Lingtning.new_match42.entity;
 
+import Lingtning.new_match42.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,11 +18,10 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
-@ToString(of = {"id", "intra", "email", "role"})
+@ToString(of = {"id", "intra", "email", "role", "blockCount"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true, nullable = false)

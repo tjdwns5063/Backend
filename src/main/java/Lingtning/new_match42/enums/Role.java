@@ -1,4 +1,4 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

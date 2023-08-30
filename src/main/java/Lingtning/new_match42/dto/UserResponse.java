@@ -1,6 +1,6 @@
 package Lingtning.new_match42.dto;
 
-import Lingtning.new_match42.entity.Role;
+import Lingtning.new_match42.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
