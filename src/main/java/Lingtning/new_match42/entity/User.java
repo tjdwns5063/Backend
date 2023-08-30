@@ -13,6 +13,7 @@ import java.util.List;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+// 유저 테이블
 @Entity
 @Table(name = "user")
 @Getter

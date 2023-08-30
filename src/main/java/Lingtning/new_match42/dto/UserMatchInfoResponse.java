@@ -11,9 +11,10 @@ import java.util.List;
 @Setter
 @Builder
 @ToString
-public class UserInterestResponse {
+public class UserMatchInfoResponse {
     private Long id;
-    private String intra;
 
-    private List<String> interests;
+    private Long mealMatchId;
+    private Long subjectMatchId;
+    private Long chatMatchId;
 }

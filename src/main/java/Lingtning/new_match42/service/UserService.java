@@ -38,14 +38,10 @@ public class UserService {
         this.userConnectBlockUserRepository = userConnectBlockUserRepository;
     }
 
-    private String getIntra(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return user.getIntra();
-    }
-
+    // 유저가 존재하는지 확인하고 정보 반환
     public User getUser(Authentication authentication) {
-        String intra = getIntra(authentication);
-        return userRepository.findByIntra(intra).orElseThrow(()
+        User user = (User) authentication.getPrincipal();
+        return userRepository.findById(user.getId()).orElseThrow(()
                 -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
     }
 

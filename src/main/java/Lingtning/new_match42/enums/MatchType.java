@@ -1,5 +1,6 @@
 package Lingtning.new_match42.enums;
 
+// 매칭의 종류
 public enum MatchType {
-    SOLO, DUO, SQUAD
+    CHAT, SUBJECT, MEAL
 }
