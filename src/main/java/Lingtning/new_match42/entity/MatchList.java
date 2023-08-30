@@ -4,25 +4,28 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-//@Entity
-//@Table(name = "match")
+// 유저와 매칭 방을 연결하는 매칭 테이블
+@Entity
+@Table(name = "match")
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
-public class Match {
+@ToString
+public class MatchList {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "match_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column
-    private Long matchNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_room_id", nullable = false)
+    private MatchRoom matchRoom;
 }
