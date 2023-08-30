@@ -34,6 +34,7 @@ public class MatchService {
     public UserMatchInfoResponse getMatchInfo(Authentication authentication) {
         User user = userService.getUser(authentication);
         List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
+
         Long mealMatchId = 0L;
         Long subjectMatchId = 0L;
         Long chatMatchId = 0L;

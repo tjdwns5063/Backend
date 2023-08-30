@@ -19,7 +19,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(exclude = "matchTable")
+@ToString(exclude = "matchList")
 public class MatchRoom {
     @Id
     @GeneratedValue(strategy = IDENTITY)
