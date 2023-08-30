@@ -150,6 +150,9 @@ public class UserService {
             .build();
         userMe.setBlockCount(userMe.getBlockCount() + 1);
 
+        connectBlockUserList.add(connectBlockUser);
+        userMe.setUserConnectBlockUser(connectBlockUserList);
+
         userConnectBlockUserRepository.save(connectBlockUser);
         userRepository.save(userMe);
 
@@ -167,6 +170,8 @@ public class UserService {
             if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
                 userConnectBlockUserRepository.delete(connectBlockUser);
                 userMe.setBlockCount(userMe.getBlockCount() - 1);
+                connectBlockUserList.remove(connectBlockUser);
+                userMe.setUserConnectBlockUser(connectBlockUserList);
                 userRepository.save(userMe);
                 return getUserResponse(userMe);
             }
