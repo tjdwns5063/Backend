@@ -2,6 +2,7 @@ package Lingtning.new_match42.controller;
 
 import Lingtning.new_match42.dto.UserInterestResponse;
 import Lingtning.new_match42.dto.UserResponse;
+import Lingtning.new_match42.entity.User;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +29,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "내 정보 조회 완료")
     })
     public UserResponse getMe(Authentication authentication) {
-        return userService.getMe(authentication);
+        User user = userService.getUser(authentication);
+        return userService.getMe(user);
     }
 
     @GetMapping("/interest/{userId}")
@@ -44,7 +46,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "관심사 추가 완료")
     })
     public UserResponse putInterest(Authentication authentication, @RequestBody List<String> interests) {
-        return userService.putInterest(authentication, interests);
+        User user = userService.getUser(authentication);
+        return userService.putInterest(user, interests);
     }
 
     @DeleteMapping("/interest")
@@ -52,7 +55,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "관심사 삭제 완료")
     })
     public UserResponse deleteInterest(Authentication authentication, @RequestParam String interest) {
-        return userService.deleteInterest(authentication, interest);
+        User user = userService.getUser(authentication);
+        return userService.deleteInterest(user, interest);
     }
 
     @PostMapping("/block")
@@ -60,7 +64,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "차단 유저 추가 완료")
     })
     public UserResponse addBlockUser(Authentication authentication, @RequestParam String blockUser) {
-        return userService.addBlockUser(authentication, blockUser);
+        User user = userService.getUser(authentication);
+        return userService.addBlockUser(user, blockUser);
     }
 
     @DeleteMapping("/block")
@@ -68,6 +73,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "차단 유저 삭제 완료")
     })
     public UserResponse deleteBlockUser(Authentication authentication, @RequestParam String blockUser) {
-        return userService.deleteBlockUser(authentication, blockUser);
+        User user = userService.getUser(authentication);
+        return userService.deleteBlockUser(user, blockUser);
     }
 }

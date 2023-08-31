@@ -1,13 +1,9 @@
 package Lingtning.new_match42.entity;
 
-import Lingtning.new_match42.enums.MatchOption;
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -25,9 +21,6 @@ public class MatchRoom {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column
-    private MatchOption selectOption;
-
     @Column(nullable = false)
     private Integer size;
 
@@ -35,11 +28,21 @@ public class MatchRoom {
     private Integer capacity;
 
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private MatchType matchType;
 
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private MatchStatus matchStatus;
 
     @OneToMany(mappedBy = "matchRoom")
     private List<MatchList> matchList;
+
+    @Builder
+    public MatchRoom(Integer size, Integer capacity, MatchType matchType, MatchStatus matchStatus) {
+        this.size = size;
+        this.capacity = capacity;
+        this.matchType = matchType;
+        this.matchStatus = matchStatus;
+    }
 }

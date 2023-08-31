@@ -9,10 +9,6 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class MatchRoomResponse {
-    private Long id;
-    private Integer size;
+public class ChatRequest {
     private Integer capacity;
-    private String matchType;
-    private String matchStatus;
 }

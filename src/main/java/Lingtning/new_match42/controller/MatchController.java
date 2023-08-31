@@ -1,7 +1,9 @@
 package Lingtning.new_match42.controller;
 
+import Lingtning.new_match42.dto.ChatRequest;
 import Lingtning.new_match42.dto.MatchRoomResponse;
 import Lingtning.new_match42.dto.UserMatchInfoResponse;
+import Lingtning.new_match42.entity.User;
 import Lingtning.new_match42.service.MatchService;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,10 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/match")
@@ -32,15 +31,17 @@ public class MatchController {
             @ApiResponse(responseCode = "200", description = "매칭 정보 반환 완료")
     })
     public UserMatchInfoResponse getMatchInfo(Authentication authentication) {
-        return matchService.getMatchInfo(authentication);
+        User user = userService.getUser(authentication);
+        return matchService.getMatchInfo(user);
     }
 
     @PostMapping("/chat/start")
     @Operation(summary = "채팅 매칭 시작 API", description = "채팅 매칭을 시작하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "채팅 매칭 시작 완료")
     })
-    public MatchRoomResponse startChatMatch(Authentication authentication) {
-        return matchService.startChatMatch(authentication);
+    public MatchRoomResponse startChatMatch(Authentication authentication, @RequestBody ChatRequest chatRequest) {
+        User user = userService.getUser(authentication);
+        return matchService.startChatMatch(user, chatRequest);
     }
 
     @PostMapping("/chat/stop")
@@ -48,6 +49,7 @@ public class MatchController {
             @ApiResponse(responseCode = "200", description = "채팅 매칭 종료 완료")
     })
     public void stopChatMatch(Authentication authentication) {
-        matchService.stopChatMatch(authentication);
+        User user = userService.getUser(authentication);
+        matchService.stopChatMatch(user);
     }
 }

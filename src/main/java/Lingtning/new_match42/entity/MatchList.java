@@ -1,10 +1,7 @@
 package Lingtning.new_match42.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -28,4 +25,10 @@ public class MatchList {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "match_room_id", nullable = false)
     private MatchRoom matchRoom;
+
+    @Builder
+    public MatchList(User user, MatchRoom matchRoom) {
+        this.user = user;
+        this.matchRoom = matchRoom;
+    }
 }
