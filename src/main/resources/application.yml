@@ -53,11 +53,6 @@ spring:
     # this option is dangerous
     hibernate:
       ddl-auto: create-drop
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-
 
 OAuth:
   uid: ${OAUTH_UID}
