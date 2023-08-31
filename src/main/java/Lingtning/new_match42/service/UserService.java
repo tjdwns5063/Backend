@@ -201,10 +201,12 @@ public class UserService {
             throw new ResponseStatusException(BAD_REQUEST, "자기 자신을 차단 해제 할 수 없습니다.");
         }
 
+        log.info("blockUser: " + blockUser);
         try {
             for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
                 if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
-                    userConnectBlockUserRepository.delete(connectBlockUser);
+                    log.info("connectBlockUser: " + connectBlockUser);
+                    userConnectBlockUserRepository.deleteById(connectBlockUser.getId());
                     user.setBlockCount(user.getBlockCount() - 1);
                     userRepository.save(user);
                     connectBlockUserList.remove(connectBlockUser);
