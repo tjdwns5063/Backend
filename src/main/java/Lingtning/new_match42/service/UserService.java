@@ -24,7 +24,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j(topic = "UserService")
 @Service
-@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final InterestRepository interestRepository;
@@ -39,6 +38,7 @@ public class UserService {
     }
 
     // 유저가 존재하는지 확인하고 정보 반환
+    @Transactional
     public User getUser(Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
@@ -58,21 +58,13 @@ public class UserService {
         List<String> blockUserList = new ArrayList<>();
 
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
-        if (connectInterestList != null) {
-            for (UserConnectInterest connectInterest : connectInterestList) {
-                interestList.add(connectInterest.getInterest().getKeyword());
-            }
-        } else {
-            log.info("connectInterestList is null");
+        for (UserConnectInterest connectInterest : connectInterestList) {
+            interestList.add(connectInterest.getInterest().getKeyword());
         }
 
         List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
-        if (connectBlockUserList != null) {
-            for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-                blockUserList.add(connectBlockUser.getBlockUser().getIntra());
-            }
-        } else {
-            log.info("connectBlockUserList is null");
+        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+            blockUserList.add(connectBlockUser.getBlockUser().getIntra());
         }
         return UserResponse.builder()
                 .id(user.getId())
@@ -89,6 +81,7 @@ public class UserService {
         return getUserResponse(user);
     }
 
+    @Transactional
     public UserResponse putInterest(User user, List<String> interests) {
         if (interests == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
@@ -136,6 +129,7 @@ public class UserService {
         return getUserResponse(user);
     }
 
+    @Transactional
     public UserResponse deleteInterest(User user, String interest) {
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
 
@@ -158,15 +152,15 @@ public class UserService {
         throw new ResponseStatusException(NOT_FOUND, "해당 관심사가 없습니다.");
     }
 
+    @Transactional
     public UserResponse addBlockUser(User user, String blockUser) {
-        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
-
         if (blockUser == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
         } else if (blockUser.equals(user.getIntra())) {
             throw new ResponseStatusException(BAD_REQUEST, "자기 자신을 차단할 수 없습니다.");
         }
 
+        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
         for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
             if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
                 throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
@@ -199,6 +193,7 @@ public class UserService {
         return getUserResponse(user);
     }
 
+    @Transactional
     public UserResponse deleteBlockUser(User user, String blockUser) {
         List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
 
@@ -227,6 +222,7 @@ public class UserService {
         throw new ResponseStatusException(NOT_FOUND, "해당 유저를 차단하고 있지 않습니다.");
     }
 
+    @Transactional
     public UserInterestResponse getInterests(Long userId) {
         if (userId == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");

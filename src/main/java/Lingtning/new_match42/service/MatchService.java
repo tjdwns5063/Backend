@@ -21,7 +21,6 @@ import java.util.List;
 
 @Slf4j(topic = "MatchService")
 @Service
-@Transactional
 public class MatchService {
     private final MatchRoomRepository matchRoomRepository;
     private final MatchListRepository matchListRepository;
@@ -32,6 +31,7 @@ public class MatchService {
         this.matchListRepository = matchListRepository;
     }
 
+    @Transactional
     public UserMatchInfoResponse getMatchInfo(User user) {
         List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
 
@@ -59,6 +59,7 @@ public class MatchService {
                 .build();
     }
 
+    @Transactional
     public MatchRoomResponse startChatMatch(User user, ChatRequest chatRequest) {
         // 일단 무조건 채팅방을 만듬
         MatchRoom matchRoom = MatchRoom.builder()
