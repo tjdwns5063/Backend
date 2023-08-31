@@ -1,14 +1,13 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Role {
+public enum MatchStatus {
 
-    USER("ROLE_USER"), ADMIN("ROLE_ADMIN");
+    WAITING("WAITING"), MATCHED("MATCHED");
 
     private final String key;
-
 }

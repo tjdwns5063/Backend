@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
 @ToString
-public class UserInterestResponse {
+public class MatchRoomResponse {
     private Long id;
-    private String intra;
-
-    private List<String> interests;
+    private Integer size;
+    private Integer capacity;
+    private String matchType;
+    private String matchStatus;
 }

@@ -1,27 +1,29 @@
 package Lingtning.new_match42.entity;
 
+import Lingtning.new_match42.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+// 유저 테이블
 @Entity
 @Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
-@ToString(of = {"id", "intra", "email", "role"})
+@ToString(of = {"id", "intra", "email", "role", "blockCount"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -34,11 +36,11 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserConnectInterest> userConnectInterest;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserConnectInterest> userConnectInterest = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<UserConnectBlockUser> userConnectBlockUser;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserConnectBlockUser> userConnectBlockUser = new ArrayList<>();
 
     @Column(nullable = false)
     private Long blockCount;

@@ -5,8 +5,8 @@ import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static lombok.AccessLevel.PUBLIC;
 
+// 유저와 관심사를 연결하는 테이블
 @Entity
 @Table(name = "user_connect_interest")
 @Getter
@@ -16,14 +16,14 @@ import static lombok.AccessLevel.PUBLIC;
 public class UserConnectInterest {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "user_connect_interest_id")
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interest", nullable = false)
+    @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
 
     @Builder
