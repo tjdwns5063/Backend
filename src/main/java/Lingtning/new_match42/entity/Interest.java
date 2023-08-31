@@ -22,7 +22,7 @@ public class Interest {
     @Column(nullable = false, unique = true)
     private String keyword;
 
-    @OneToMany(mappedBy = "interest")
+    @OneToMany(mappedBy = "interest", fetch = FetchType.LAZY)
     private List<UserConnectInterest> userConnectInterest;
 
     @Builder

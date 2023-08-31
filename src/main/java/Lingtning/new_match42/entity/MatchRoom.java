@@ -35,7 +35,7 @@ public class MatchRoom {
     @Enumerated(value = EnumType.STRING)
     private MatchStatus matchStatus;
 
-    @OneToMany(mappedBy = "matchRoom")
+    @OneToMany(mappedBy = "matchRoom", fetch = FetchType.LAZY)
     private List<MatchList> matchList;
 
     @Builder

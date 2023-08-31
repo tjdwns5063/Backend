@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,11 +36,11 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserConnectInterest> userConnectInterest;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserConnectInterest> userConnectInterest = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<UserConnectBlockUser> userConnectBlockUser;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserConnectBlockUser> userConnectBlockUser = new ArrayList<>();
 
     @Column(nullable = false)
     private Long blockCount;
