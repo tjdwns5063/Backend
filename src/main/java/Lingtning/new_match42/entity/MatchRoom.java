@@ -4,7 +4,9 @@ import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,9 @@ public class MatchRoom {
 
     @OneToMany(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private List<MatchList> matchList = new ArrayList<>();
+
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     @Builder
     public MatchRoom(Integer size, Integer capacity, MatchType matchType, MatchStatus matchStatus) {

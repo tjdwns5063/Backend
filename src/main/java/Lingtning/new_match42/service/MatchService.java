@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j(topic = "MatchService")
 @Service
@@ -59,21 +60,67 @@ public class MatchService {
                 .build();
     }
 
+    public boolean isChatMatched(User user) {
+        List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
+
+        for (MatchList match : matchList) {
+            MatchRoom matchRoom = match.getMatchRoom();
+
+            if (matchRoom.getMatchStatus() == MatchStatus.WAITING && matchRoom.getMatchType() == MatchType.CHAT) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public MatchRoom findChatMatch(User user, Integer capacity) {
+        MatchRoom matchRooms = matchRoomRepository.findTopByMatchTypeAndMatchStatusAndCapacityOrderByCreatedDate(MatchType.CHAT, MatchStatus.WAITING, capacity).orElse(null);
+        return null;
+    }
+
     public MatchRoomResponse startChatMatch(User user, ChatRequest chatRequest) {
         // 일단 무조건 채팅방을 만듬
-        MatchRoom matchRoom = MatchRoom.builder()
-                .size(1)
-                .capacity(chatRequest.getCapacity())
-                .matchType(MatchType.CHAT)
-                .matchStatus(MatchStatus.WAITING)
-                .build();
+        log.info("startChatMatch: {}", chatRequest.getCapacity());
+        if (isChatMatched(user)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 매칭중인 유저입니다.");
+        }
+        MatchRoom matchRoom = matchRoomRepository.findTopByMatchTypeAndMatchStatusAndCapacityOrderByCreatedDate(
+                MatchType.CHAT, MatchStatus.WAITING, chatRequest.getCapacity()).orElse(null);
+        if (matchRoom != null) {
+            log.info("matchRoom: {}", matchRoom.getId());
+            matchRoom.setSize(matchRoom.getSize() + 1);
+            if (Objects.equals(matchRoom.getSize(), matchRoom.getCapacity())) {
+                matchRoom.setMatchStatus(MatchStatus.MATCHED);
+            }
+        } else {
+            matchRoom = MatchRoom.builder()
+                    .size(1)
+                    .capacity(chatRequest.getCapacity())
+                    .matchType(MatchType.CHAT)
+                    .matchStatus(MatchStatus.WAITING)
+                    .build();
+        }
         try {
-            matchRoomRepository.save(matchRoom);
+            if (matchRoom.getMatchStatus().equals(MatchStatus.WAITING)) {
+                matchRoom = matchRoomRepository.save(matchRoom);
+            } else if (matchRoom.getMatchStatus().equals(MatchStatus.MATCHED)) {
+                matchRoomRepository.deleteById(matchRoom.getId());
+                return MatchRoomResponse.builder()
+                        .id(matchRoom.getId())
+                        .size(matchRoom.getSize())
+                        .capacity(matchRoom.getCapacity())
+                        .matchType("CHAT")
+                        .matchStatus("MATCHED")
+                        .build();
+            }
         } catch (Exception e) {
             log.error("matchRoomRepository.save(matchRoom) error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 생성 에러");
         }
-
+        if (matchListRepository.findByMatchRoom_Id(matchRoom.getId()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 매칭중인 유저입니다.");
+        }
         MatchList matchList = MatchList.builder()
                 .user(user)
                 .matchRoom(matchRoom)
@@ -86,8 +133,9 @@ public class MatchService {
         }
 
         return MatchRoomResponse.builder()
-                .size(0)
-                .capacity(chatRequest.getCapacity())
+                .id(matchRoom.getId())
+                .size(matchRoom.getSize())
+                .capacity(matchRoom.getCapacity())
                 .matchType("CHAT")
                 .matchStatus("WAITING")
                 .build();
@@ -98,7 +146,7 @@ public class MatchService {
         if (waitingMatchRoom == null) {
             chatRequest.setCapacity( chatRequest.getCapacity() != null ? chatRequest.getCapacity() : 2);
             //System.out.println(chatRequest.getCapacity());
-            startChatMatch(user, chatRequest);
+//            startChatMatch(user, chatRequest);
         } else {
             MatchList matchList = MatchList.builder()
                     .user(user)
