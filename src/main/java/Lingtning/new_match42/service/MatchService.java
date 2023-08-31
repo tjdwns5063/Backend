@@ -10,6 +10,7 @@ import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import Lingtning.new_match42.repository.MatchRoomRepository;
 import Lingtning.new_match42.repository.MatchListRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Slf4j(topic = "MatchService")
 @Service
+@Transactional
 public class MatchService {
     private final MatchRoomRepository matchRoomRepository;
     private final MatchListRepository matchListRepository;
