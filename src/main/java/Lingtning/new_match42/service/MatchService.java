@@ -102,6 +102,7 @@ public class MatchService {
                     .user(user)
                     .matchRoom(waitingMatchRoom)
                     .build();
+            changeMatchstatus(waitingMatchRoom);
             try {
                 matchListRepository.save(matchList);
             } catch (Exception e) {
