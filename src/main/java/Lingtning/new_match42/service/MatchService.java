@@ -91,6 +91,37 @@ public class MatchService {
                 .build();
     }
 
+    public void waitingMatchRoom(User user, ChatRequest chatRequest) {
+        MatchRoom waitingMatchRoom = matchRoomRepository.findByMatchStatusAndMatchType(MatchStatus.WAITING, MatchType.CHAT);
+        if (waitingMatchRoom == null) {
+            chatRequest.setCapacity( chatRequest.getCapacity() != null ? chatRequest.getCapacity() : 2);
+            //System.out.println(chatRequest.getCapacity());
+            startChatMatch(user, chatRequest);
+        } else {
+            MatchList matchList = MatchList.builder()
+                    .user(user)
+                    .matchRoom(waitingMatchRoom)
+                    .build();
+            try {
+                matchListRepository.save(matchList);
+            } catch (Exception e) {
+                log.error("matchListRepository.save(matchList) error: {}", e.getMessage());
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 리스트 생성 에러");
+            }
+        }
+    }
+
+    public void changeMatchstatus(MatchRoom matchRoom) {
+        int count = matchListRepository.countByMatchRoom(matchRoom);
+
+        if (count == matchRoom.getCapacity()) {
+            matchRoom.setMatchStatus(MatchStatus.MATCHED);
+        } else {
+            matchRoom.setMatchStatus(MatchStatus.WAITING);
+        }
+
+        matchRoomRepository.save(matchRoom);
+    }
     public void stopChatMatch(User user) {
     }
 }
