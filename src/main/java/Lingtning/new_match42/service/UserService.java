@@ -49,6 +49,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public UserResponse getUserResponse(User user) {
         if (user == null) {
             throw new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다.");
@@ -77,6 +78,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public UserResponse getMe(User user) {
         return getUserResponse(user);
     }
