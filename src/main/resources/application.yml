@@ -51,7 +51,13 @@ spring:
     show-sql: true
     defer-datasource-initialization: true
     # this option is dangerous
-    hibernate.ddl-auto: create-drop
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
 
 OAuth:
   uid: ${OAUTH_UID}

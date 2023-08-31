@@ -5,6 +5,7 @@ import Lingtning.new_match42.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -35,8 +36,8 @@ public class MatchRoom {
     @Enumerated(value = EnumType.STRING)
     private MatchStatus matchStatus;
 
-    @OneToMany(mappedBy = "matchRoom", fetch = FetchType.LAZY)
-    private List<MatchList> matchList;
+    @OneToMany(mappedBy = "matchRoom", fetch = FetchType.EAGER)
+    private List<MatchList> matchList = new ArrayList<>();
 
     @Builder
     public MatchRoom(Integer size, Integer capacity, MatchType matchType, MatchStatus matchStatus) {

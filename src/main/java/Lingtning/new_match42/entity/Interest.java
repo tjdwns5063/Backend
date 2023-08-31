@@ -3,6 +3,7 @@ package Lingtning.new_match42.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -22,8 +23,8 @@ public class Interest {
     @Column(nullable = false, unique = true)
     private String keyword;
 
-    @OneToMany(mappedBy = "interest", fetch = FetchType.LAZY)
-    private List<UserConnectInterest> userConnectInterest;
+    @OneToMany(mappedBy = "interest", fetch = FetchType.EAGER)
+    private List<UserConnectInterest> userConnectInterest = new ArrayList<>();
 
     @Builder
     public Interest(Long id, String keyword, List<UserConnectInterest> userConnectInterest) {

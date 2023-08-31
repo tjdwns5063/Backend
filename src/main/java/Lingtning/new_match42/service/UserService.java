@@ -24,6 +24,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j(topic = "UserService")
 @Service
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final InterestRepository interestRepository;
@@ -38,7 +39,6 @@ public class UserService {
     }
 
     // 유저가 존재하는지 확인하고 정보 반환
-    @Transactional
     public User getUser(Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
@@ -49,7 +49,6 @@ public class UserService {
         }
     }
 
-    @Transactional
     public UserResponse getUserResponse(User user) {
         if (user == null) {
             throw new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다.");
@@ -78,12 +77,10 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
     public UserResponse getMe(User user) {
         return getUserResponse(user);
     }
 
-    @Transactional
     public UserResponse putInterest(User user, List<String> interests) {
         if (interests == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
@@ -131,7 +128,6 @@ public class UserService {
         return getUserResponse(user);
     }
 
-    @Transactional
     public UserResponse deleteInterest(User user, String interest) {
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
 
@@ -154,7 +150,6 @@ public class UserService {
         throw new ResponseStatusException(NOT_FOUND, "해당 관심사가 없습니다.");
     }
 
-    @Transactional
     public UserResponse addBlockUser(User user, String blockUser) {
         if (blockUser == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
@@ -195,7 +190,6 @@ public class UserService {
         return getUserResponse(user);
     }
 
-    @Transactional
     public UserResponse deleteBlockUser(User user, String blockUser) {
         List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
 
@@ -224,7 +218,6 @@ public class UserService {
         throw new ResponseStatusException(NOT_FOUND, "해당 유저를 차단하고 있지 않습니다.");
     }
 
-    @Transactional
     public UserInterestResponse getInterests(Long userId) {
         if (userId == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
