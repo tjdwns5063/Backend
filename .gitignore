@@ -35,3 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### key ###
+firebase-adminsdk.json
+
+
+## ilko ##
+
+caches/
+daemon/
+native/
+wrapper/
