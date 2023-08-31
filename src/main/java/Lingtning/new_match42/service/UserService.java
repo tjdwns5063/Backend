@@ -58,17 +58,21 @@ public class UserService {
         List<String> blockUserList = new ArrayList<>();
 
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
-        log.info("connectInterestList.size(): " + connectInterestList.size());
-        if (!connectInterestList.isEmpty()) {
-            log.info(connectInterestList.get(0).toString());
-        }
-        for (UserConnectInterest connectInterest : connectInterestList) {
-            interestList.add(connectInterest.getInterest().getKeyword());
+        if (connectInterestList != null) {
+            for (UserConnectInterest connectInterest : connectInterestList) {
+                interestList.add(connectInterest.getInterest().getKeyword());
+            }
+        } else {
+            log.info("connectInterestList is null");
         }
 
         List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
-        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-            blockUserList.add(connectBlockUser.getBlockUser().getIntra());
+        if (connectBlockUserList != null) {
+            for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+                blockUserList.add(connectBlockUser.getBlockUser().getIntra());
+            }
+        } else {
+            log.info("connectBlockUserList is null");
         }
         return UserResponse.builder()
                 .id(user.getId())
