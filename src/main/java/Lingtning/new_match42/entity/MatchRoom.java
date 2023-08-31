@@ -36,7 +36,7 @@ public class MatchRoom {
     @Enumerated(value = EnumType.STRING)
     private MatchStatus matchStatus;
 
-    @OneToMany(mappedBy = "matchRoom", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private List<MatchList> matchList = new ArrayList<>();
 
     @Builder

@@ -23,7 +23,7 @@ public class Interest {
     @Column(nullable = false, unique = true)
     private String keyword;
 
-    @OneToMany(mappedBy = "interest", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "interest", cascade = CascadeType.ALL)
     private List<UserConnectInterest> userConnectInterest = new ArrayList<>();
 
     @Builder

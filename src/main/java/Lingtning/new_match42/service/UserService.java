@@ -19,8 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j(topic = "UserService")
 @Service
@@ -57,12 +56,12 @@ public class UserService {
         List<String> interestList = new ArrayList<>();
         List<String> blockUserList = new ArrayList<>();
 
-        List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
+        List<UserConnectInterest> connectInterestList = userConnectInterestRepository.findByUser_Id(user.getId());
         for (UserConnectInterest connectInterest : connectInterestList) {
             interestList.add(connectInterest.getInterest().getKeyword());
         }
 
-        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
+        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
         for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
             blockUserList.add(connectBlockUser.getBlockUser().getIntra());
         }
@@ -83,18 +82,17 @@ public class UserService {
 
     public UserResponse putInterest(User user, List<String> interests) {
         if (interests == null) {
-            throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
+            throw new ResponseStatusException(BAD_REQUEST, "관심사를 설정해 주세요.");
         }
 
         try {
-            List<UserConnectInterest> connectInterest = user.getUserConnectInterest();
-            for (UserConnectInterest userConnectInterest : connectInterest) {
-                userConnectInterestRepository.delete(userConnectInterest);
-            }
+            List<UserConnectInterest> connectInterest = userConnectInterestRepository.findByUser_Id(user.getId());
+            userConnectInterestRepository.deleteAll(connectInterest);
         } catch (Exception e) {
-            log.info("deleteAll: " + e.getMessage());
+            log.info("delete: " + e.getMessage());
             throw new ResponseStatusException(BAD_REQUEST, "관심사를 설정할 수 없습니다.");
         }
+
         if (interests.size() > 5) {
             throw new ResponseStatusException(BAD_REQUEST, "관심사는 최대 5개까지 설정할 수 있습니다.");
         }
@@ -104,15 +102,19 @@ public class UserService {
             for (String interest : interests) {
                 Interest findInterest = interestRepository.findByKeyword(interest).orElse(null);
                 if (findInterest == null) {
-                    findInterest = interestRepository.save(
-                        Interest.builder()
-                        .keyword(interest)
-                        .build());
+                    interestRepository.save(Interest.builder()
+                            .keyword(interest)
+                            .build());
+                    findInterest = interestRepository.findByKeyword(interest).orElseThrow(()
+                            -> new ResponseStatusException(NOT_FOUND, "관심사를 저장 할 수 없습니다."));
                 }
                 UserConnectInterest userConnectInterest = UserConnectInterest.builder()
                     .user(user)
                     .interest(findInterest)
                     .build();
+                log.info("userConnectInterest: " + userConnectInterest);
+                log.info("user: " + user);
+                log.info("findInterest: " + findInterest);
                 userConnectInterestRepository.save(userConnectInterest);
                 connectInterestList.add(userConnectInterest);
                 log.info("interest: " + interest);
@@ -122,14 +124,14 @@ public class UserService {
             userRepository.save(user);
         } catch (Exception e) {
             log.info("save: " + e.getMessage());
-            throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
+            throw new ResponseStatusException(INTERNAL_SERVER_ERROR, "저장 중에 에러 발생");
         }
 
         return getUserResponse(user);
     }
 
     public UserResponse deleteInterest(User user, String interest) {
-        List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
+        List<UserConnectInterest> connectInterestList = userConnectInterestRepository.findByUser_Id(user.getId());
 
         if (interest == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
@@ -157,7 +159,7 @@ public class UserService {
             throw new ResponseStatusException(BAD_REQUEST, "자기 자신을 차단할 수 없습니다.");
         }
 
-        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
+        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
         for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
             if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
                 throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
@@ -191,7 +193,7 @@ public class UserService {
     }
 
     public UserResponse deleteBlockUser(User user, String blockUser) {
-        List<UserConnectBlockUser> connectBlockUserList = user.getUserConnectBlockUser();
+        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
 
         if (blockUser == null) {
             throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
@@ -226,7 +228,7 @@ public class UserService {
                 -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
 
         List<String> interestList = new ArrayList<>();
-        List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
+        List<UserConnectInterest> connectInterestList = userConnectInterestRepository.findByUser_Id(user.getId());
 
         for (UserConnectInterest connectInterest : connectInterestList) {
             interestList.add(connectInterest.getInterest().getKeyword());
