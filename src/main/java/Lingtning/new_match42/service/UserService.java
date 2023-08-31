@@ -88,7 +88,9 @@ public class UserService {
 
         try {
             List<UserConnectInterest> connectInterest = user.getUserConnectInterest();
-            userConnectInterestRepository.deleteAll(connectInterest);
+            for (UserConnectInterest userConnectInterest : connectInterest) {
+                userConnectInterestRepository.delete(userConnectInterest);
+            }
         } catch (Exception e) {
             log.info("deleteAll: " + e.getMessage());
             throw new ResponseStatusException(BAD_REQUEST, "관심사를 설정할 수 없습니다.");
