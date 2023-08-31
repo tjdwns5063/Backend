@@ -58,6 +58,10 @@ public class UserService {
         List<String> blockUserList = new ArrayList<>();
 
         List<UserConnectInterest> connectInterestList = user.getUserConnectInterest();
+        log.info("connectInterestList.size(): " + connectInterestList.size());
+        if (!connectInterestList.isEmpty()) {
+            log.info(connectInterestList.get(0).toString());
+        }
         for (UserConnectInterest connectInterest : connectInterestList) {
             interestList.add(connectInterest.getInterest().getKeyword());
         }
