@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-/** test **/
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -26,9 +28,9 @@ public class FirebaseController {
     @Operation(summary = "Hello!", description = "처음으로 만든 API", responses = {
             @ApiResponse(responseCode = "200", description = "야호! 성공!!!")
     })
-    public String  helloFirebase() {
+    public List<Map<String, Object>> helloFirebase() {
         // FirebaseService를 통한 작업 수행
-        String firebaseData = firebaseService.readAndWriteData().toString(); // 예시로 Firebase 데이터를 가져온다고 가정
-        return firebaseData; // Firebase 데이터를 반환
+        List<Map<String, Object>> firebaseDataList = firebaseService.readAllDataFromRoomsCollection();
+        return firebaseDataList; // 모든 Firebase 데이터를 반환
     }
 }

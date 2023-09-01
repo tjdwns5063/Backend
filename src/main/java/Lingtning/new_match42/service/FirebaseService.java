@@ -1,15 +1,15 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.entity.User;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
-import com.google.firebase.database.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -17,23 +17,25 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class FirebaseService {
 
-    public Map<String, Object> readAndWriteData() {
+    public List<Map<String, Object>> readAllDataFromRoomsCollection() {
         final Firestore client = FirestoreClient.getFirestore();
-        Map<String, Object> data = new HashMap<>();
+        List<Map<String, Object>> dataList = new ArrayList<>();
 
-        ApiFuture<DocumentSnapshot> result = client.collection("rooms").document("1").get();
+        ApiFuture<QuerySnapshot> querySnapshot = client.collection("rooms").get();
 
         try {
-            DocumentSnapshot document = result.get();
-            if (document.exists()) {
-                data = document.getData();
-                System.out.println("Document data: " + data);
-            } else {
-                System.out.println("No such document");
+            QuerySnapshot snapshot = querySnapshot.get();
+            List<QueryDocumentSnapshot> documents = snapshot.getDocuments();
+
+            for (QueryDocumentSnapshot document : documents) {
+                Map<String, Object> data = document.getData();
+                log.info("Firebase Data: " + data);
+               // System.out.println("문서 데이터: " + data);
+                dataList.add(data);
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return data; // Firestore 데이터를 반환
+        return dataList; // firebase 데이터 전체 리턴
     }
 }
