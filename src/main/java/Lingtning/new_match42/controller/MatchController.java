@@ -35,6 +35,14 @@ public class MatchController {
         return matchService.getMatchInfo(user);
     }
 
+    @GetMapping("/room/{id}")
+    @Operation(summary = "매칭 방 정보 반환 API", description = "매칭 방 정보를 반환하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "매칭 방 정보 반환 완료")
+    })
+    public MatchRoomResponse getMatchRoomInfo(@PathVariable Long id) {
+        return matchService.getMatchRoomInfo(id);
+    }
+
     @PostMapping("/chat/start")
     @Operation(summary = "채팅 매칭 시작 API", description = "채팅 매칭을 시작하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "채팅 매칭 시작 완료")
@@ -53,13 +61,14 @@ public class MatchController {
         matchService.stopChatMatch(user);
     }
 
-    @PostMapping("/chat/waiting")
-    @Operation(summary = "대기 중인 채팅 매칭 확인 API", description = "대기 중인 채팅 매칭이 있는지 확인하고 시작하는 API", responses = {
-            @ApiResponse(responseCode = "200", description = "대기 중인 채팅 매칭 시작 완료")
-    })
-    public void waitingChatMatch(Authentication authentication, ChatRequest chatRequest) {
-        System.out.println(chatRequest.getCapacity());
-        User user = userService.getUser(authentication);
-        matchService.waitingMatchRoom(user, chatRequest);
-    }
+    /* /chat/start 로직에 반영하여 일단 여기는 주석 처리 */
+//    @PostMapping("/chat/waiting")
+//    @Operation(summary = "대기 중인 채팅 매칭 확인 API", description = "대기 중인 채팅 매칭이 있는지 확인하는 API", responses = {
+//            @ApiResponse(responseCode = "200", description = "대기 중인 채팅 매칭 시작 완료")
+//    })
+//    public void waitingChatMatch(Authentication authentication, ChatRequest chatRequest) {
+//        System.out.println(chatRequest.getCapacity());
+//        User user = userService.getUser(authentication);
+//        matchService.waitingMatchRoom(user, chatRequest);
+//    }
 }
