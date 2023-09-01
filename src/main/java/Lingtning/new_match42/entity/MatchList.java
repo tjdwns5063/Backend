@@ -2,6 +2,9 @@ package Lingtning.new_match42.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -25,6 +28,9 @@ public class MatchList {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_room_id", nullable = false)
     private MatchRoom matchRoom;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     @Builder
     public MatchList(User user, MatchRoom matchRoom) {

@@ -37,15 +37,20 @@ public class UserService {
         this.userConnectBlockUserRepository = userConnectBlockUserRepository;
     }
 
-    // 유저가 존재하는지 확인하고 정보 반환
+    // 로그인 했는지 확인하고 정보 반환
     public User getUser(Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
             return userRepository.findById(user.getId()).orElseThrow(()
                     -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
         } catch (Exception e) {
-            throw new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다.");
+            throw new ResponseStatusException(NOT_FOUND, "로그인 되어 있지 않습니다.");
         }
+    }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()
+                -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
     }
 
     public UserResponse getUserResponse(User user) {

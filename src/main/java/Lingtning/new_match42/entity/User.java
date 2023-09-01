@@ -45,8 +45,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Long blockCount;
 
+    @Column()
+    private String fcmToken;
+
     @Builder
-    public User(Long id, String email, String intra, Role role, List<UserConnectInterest> userConnectInterest, List<UserConnectBlockUser> userConnectBlockUser, Long blockCount) {
+    public User(Long id, String email, String intra, Role role, List<UserConnectInterest> userConnectInterest, List<UserConnectBlockUser> userConnectBlockUser, Long blockCount, String fcmToken) {
         this.id = id;
         this.email = email;
         this.intra = intra;
@@ -54,6 +57,7 @@ public class User implements UserDetails {
         this.userConnectInterest = userConnectInterest;
         this.userConnectBlockUser = userConnectBlockUser;
         this.blockCount = blockCount;
+        this.fcmToken = fcmToken;
     }
 
     @Override

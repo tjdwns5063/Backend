@@ -1,14 +1,16 @@
 package Lingtning.new_match42.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @ToString
+@NoArgsConstructor
 public class ChatRequest {
     private Integer capacity;
+
+    @Builder
+    public ChatRequest(Integer capacity) {
+        this.capacity = capacity;
+    }
 }

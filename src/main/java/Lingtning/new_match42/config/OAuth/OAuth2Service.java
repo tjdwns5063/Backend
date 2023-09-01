@@ -37,6 +37,7 @@ public class OAuth2Service extends DefaultOAuth2UserService {
             .email(oAuth2User.getAttribute("email"))
             .role(Role.USER)
             .blockCount(0L)
+            .fcmToken(null)
             .build());
         }
 
