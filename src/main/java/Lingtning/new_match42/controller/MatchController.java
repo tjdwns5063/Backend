@@ -62,7 +62,7 @@ public class MatchController {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startChatMatch(user, chatRequest);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
-            List<Map<String, Object>> firebaseDataList = firebaseService.createChatRoomInFireBase(matchRoomResponse.getId());
+            firebaseService.createChatRoomInFireBase(matchRoomResponse.getId());
         }
         return matchRoomResponse;
     }
@@ -74,16 +74,6 @@ public class MatchController {
     public void stopChatMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
         matchService.stopChatMatch(user);
-    }
-
-    @GetMapping("/chat/start/firebaseinit")
-    @Operation(summary = "채팅시작 firebase 채팅방 생성", description = "처음으로 만든 API", responses = {
-            @ApiResponse(responseCode = "200", description = "야호! 성공!!!")
-    })
-    public List<Map<String, Object>> helloFirebase() {
-        // FirebaseService를 통한 작업 수행`
-        List<Map<String, Object>> firebaseDataList = firebaseService.createChatRoomInFireBase();
-        return firebaseDataList; // 모든 Firebase 데이터를 반환
     }
 }
 

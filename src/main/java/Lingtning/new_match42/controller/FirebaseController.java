@@ -1,7 +1,6 @@
 package Lingtning.new_match42.controller;
 
 import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.service.FCMService;
 import Lingtning.new_match42.service.FirebaseService;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "firebasetest", description = "테스트 API")
 public class FirebaseController {
     private final FirebaseService firebaseService;
-    private final FCMService fcmService;
     private final UserService userService;
 
     @GetMapping("/test")
@@ -45,7 +43,7 @@ public class FirebaseController {
     })
     public ResponseEntity<?> subscribeToken(Authentication authentication, @RequestParam String token) {
         User user = userService.getUser(authentication);
-        return fcmService.subscribeToken(user, token);
+        return firebaseService.subscribeToken(user, token);
     }
 
     @PostMapping("/message/send/{userId}")
@@ -54,6 +52,6 @@ public class FirebaseController {
     })
     public ResponseEntity<?> sendChatMessage(@PathVariable Long userId, @RequestParam String message) {
         User user = userService.getUser(userId);
-        return fcmService.sendChatMessage(user.getFcmToken(), message);
+        return firebaseService.sendChatMessage(user.getFcmToken(), message);
     }
 }

@@ -2,7 +2,10 @@ package Lingtning.new_match42.service;
 
 import Lingtning.new_match42.entity.MatchList;
 import Lingtning.new_match42.entity.MatchRoom;
+import Lingtning.new_match42.entity.User;
 import Lingtning.new_match42.repository.MatchListRepository;
+import Lingtning.new_match42.repository.MatchRoomRepository;
+import Lingtning.new_match42.repository.UserRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
@@ -10,89 +13,181 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.messaging.*;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 @Transactional
 public class FirebaseService {
+    private final MatchListRepository matchListRepository;
+    private final MatchRoomRepository matchRoomRepository;
+    private final FirebaseMessaging firebaseMessaging;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private MatchListRepository matchListRepository;
+    // user에게 message를 보내는 함수
+    public ResponseEntity<?> sendChatMessage(String token, String message) {
+        if (token == null) {
+            throw new ResponseStatusException(BAD_REQUEST, "알림을 받을 대상에게 FCM 토큰이 없습니다.");
+        }
+        Notification notification = Notification.builder()
+                .setTitle("매치42")
+                .setBody(message)
+                .build();
 
-    public List<Map<String, Object>> createChatRoomInFireBase(Long roomId) {
+        MulticastMessage fcmMessage = MulticastMessage.builder()
+                .setNotification(notification)
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setTtl(3600 * 1000)
+                        .setPriority(AndroidConfig.Priority.HIGH)
+                        .build())
+                .setApnsConfig(ApnsConfig.builder()
+                        .setAps(Aps.builder()
+                                .setContentAvailable(true)
+                                .build())
+                        .putHeader("apns-push-type", "background")
+                        .putHeader("apns-priority", "5")
+                        .putHeader("apns-topic", "com.lingtning.match42")
+                        .build())
+                .addToken(token)
+                .build();
+
+        try { // FCM 메시지를 보내는 함수
+            firebaseMessaging.sendEachForMulticast(fcmMessage);
+        } catch (FirebaseMessagingException e) {
+            throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+        }
+        return ResponseEntity.ok("FCM 메시지 전송에 성공했습니다.");
+    }
+
+    // user들에게 한번에 message를 보내는 함수
+    public ResponseEntity<?> broadCastChatMessage(List<String> tokens, String message) {
+        if (tokens == null || tokens.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "알림을 받을 대상에게 FCM 토큰이 없습니다.");
+        }
+        Notification notification = Notification.builder()
+                .setTitle("매치42")
+                .setBody(message)
+                .build();
+
+        MulticastMessage fcmMessage = MulticastMessage.builder()
+                .setNotification(notification)
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setTtl(3600 * 1000)
+                        .setPriority(AndroidConfig.Priority.HIGH)
+                        .build())
+                .setApnsConfig(ApnsConfig.builder()
+                        .setAps(Aps.builder()
+                                .setContentAvailable(true)
+                                .build())
+                        .putHeader("apns-push-type", "background")
+                        .putHeader("apns-priority", "5")
+                        .putHeader("apns-topic", "com.lingtning.match42")
+                        .build())
+                .addAllTokens(tokens)
+                .build();
+
+        try { // FCM 메시지를 보내는 함수
+            firebaseMessaging.sendEachForMulticast(fcmMessage);
+        } catch (FirebaseMessagingException e) {
+            throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+        }
+        return ResponseEntity.ok("FCM 메시지 전송에 성공했습니다.");
+    }
+
+    public ResponseEntity<?> subscribeToken(User user, String token) {
+        user.setFcmToken(token);
+        try {
+            sendChatMessage(user.getFcmToken(), "FCM 토큰 등록에 성공했습니다.");
+            userRepository.save(user);
+        } catch (Exception e) {
+            user.setFcmToken(null);
+            throw new ResponseStatusException(INTERNAL_SERVER_ERROR, "FCM 토큰 등록에 실패했습니다.");
+        }
+        return ResponseEntity.ok("FCM 토큰 등록에 성공했습니다.");
+    }
+
+    public void createChatRoomInFireBase(Long roomId) {
         final Firestore client = FirestoreClient.getFirestore();
-        List<Map<String, Object>> chatRoomDataList = new ArrayList<>();
 
         // 데이터베이스에서 필요한 정보를 조회
         List<MatchList> matchLists = matchListRepository.findByMatchRoom_Id(roomId); // 모든 MatchList 레코드 조회
 
-        for (MatchList matchList : matchLists) { // 매개변수로 match_list의 id를 가져온다면 필요없을듯
-            List<Integer> userIds = new ArrayList<>();
-            userIds.add(Math.toIntExact(matchList.getUser().getId()));
+        List<Long> userIds = new ArrayList<>(); // 유저 아이디를 담을 리스트
+        for (MatchList matchList : matchLists) {
+            userIds.add(matchList.getUser().getId()); // 유저 아이디를 리스트에 추가
         }
 
-            // MatchRoom 정보 조회  매개변수로 match_list의 id를 가져온다면 필요없을듯
-//            MatchRoom matchRoom = matchLists.get
-            if (matchRoom == null) {
-                continue;
-            }
+        MatchRoom matchRoom = matchRoomRepository.findById(roomId).orElseThrow(() -> (
+                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "해당하는 매칭 방이 없습니다.")
+        )) ; // 매칭 방 조회
 
-        // match_room_id를 기준으로 그룹화
-        Map<Long, List<MatchList>> matchListsByMatchRoomId = matchLists.stream()
-                .collect(Collectors.groupingBy(matchList -> matchList.getMatchRoom().getId()));
+        // 매칭 방 삭제
+        matchRoomRepository.deleteById(roomId);
 
-            // 채팅방 데이터 생성 및 Firestore에 추가
-            Map<String, Object> chatRoomData = new HashMap<>();
-            chatRoomData.put("lastMsg", new HashMap<String, Object>() {{
-                put("data", null);
-                put("message", null);
-                put("sender", new HashMap<String, Object>() {{
-                    put("id", null);
-                    put("intra", "");
-                    put("nickname", "");
-                    put("profile", "");
-                }});
+        // 채팅방 데이터 생성 및 Firestore에 추가
+        Map<String, Object> chatRoomData = new HashMap<>();
+        chatRoomData.put("lastMsg", new HashMap<String, Object>() {{
+            put("data", null);
+            put("message", null);
+            put("sender", new HashMap<String, Object>() {{
+                put("id", null);
+                put("intra", "");
+                put("nickname", "");
+                put("profile", "");
             }});
-            chatRoomData.put("name", "test");
-            chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
-            chatRoomData.put("type", matchRoom.getMatchType().toString()); // match_room 테이블의 match_type 값을 사용
-            // unread 필드 초기화
-            Map<String, Integer> unread = new HashMap<>();
-            for (Integer userId : userIds) {
-                unread.put(String.valueOf(userId), 0);
-            }
-            chatRoomData.put("unread", unread);
+        }});
 
-            // users 필드 초기화
-            Map<String, Integer> users = new HashMap<>();
-            for (Integer userId : userIds) {
-                users.put(String.valueOf(userId), userId);
-            }
-            chatRoomData.put("users", users);
+        chatRoomData.put("name", "test");
+        chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
+        chatRoomData.put("type", matchRoom.getMatchType().toString()); // match_room 테이블의 match_type 값을 사용
 
-            // rooms 컬렉션에 데이터 추가
+        // users 필드 초기화
+        Map<String, Long> users = new HashMap<>();
+        for (int i = 0; i < userIds.size(); ++i) {
+            users.put(String.valueOf(i), userIds.get(i));
+        }
+        chatRoomData.put("users", users);
+
+        // unread 필드 초기화
+        Map<String, Integer> unread = new HashMap<>();
+        for (Long userId : userIds) {
+            unread.put(String.valueOf(userId), 0);
+        }
+        chatRoomData.put("unread", unread);
+
+        // rooms 컬렉션에 데이터 추가
+        try {
+            // 채팅방 생성
             ApiFuture<DocumentReference> result = client.collection("rooms").add(chatRoomData);
-            try {
-                DocumentReference documentReference = result.get();
-                log.info("Chat Room Created with ID: " + documentReference.getId());
-                chatRoomDataList.add(chatRoomData);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            // 매칭 알림 보내기
+            List<String> tokens = new ArrayList<>();
+            userRepository.findAllById(userIds).forEach(user -> {
+                if (user.getFcmToken() != null) {
+                    tokens.add(user.getFcmToken());
+                }
+            });
+            broadCastChatMessage(tokens, "매칭이 성사되었습니다.");
+            log.info("Chat Room Created with ID: " + result.get().getId());
+        } catch (Exception e) {
+            log.error("Error: " + e.getMessage());
+        }
 
         log.info("Chat Room Created DONE");
-        return chatRoomDataList;
     }
 
 

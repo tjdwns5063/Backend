@@ -106,7 +106,6 @@ public class MatchService {
             if (matchRoom.getMatchStatus().equals(MatchStatus.WAITING)) {
                 matchRoom = matchRoomRepository.save(matchRoom);
             } else if (matchRoom.getMatchStatus().equals(MatchStatus.MATCHED)) {
-//                matchRoomRepository.deleteById(matchRoom.getId());
                 return MatchRoomResponse.builder()
                         .id(matchRoom.getId())
                         .size(matchRoom.getSize())
