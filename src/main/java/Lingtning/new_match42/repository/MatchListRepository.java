@@ -15,5 +15,7 @@ public interface MatchListRepository extends JpaRepository<MatchList, Long> {
 
     List<MatchList> findByUser_Id(Long userId);
 
-    Optional<MatchList> findByMatchRoom_Id(Long matchRoomId);
+    List<MatchList> findByMatchRoom_Id(Long matchRoomId);
+
+    Optional<MatchList> findByMatchRoom_IdAndUser_Id(Long roomId, Long userId);
 }

@@ -60,13 +60,13 @@ public class MatchService {
                 .build();
     }
 
-    public boolean isChatMatched(User user) {
+    public boolean isMatched(User user, MatchType matchType) {
         List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
 
         for (MatchList match : matchList) {
             MatchRoom matchRoom = match.getMatchRoom();
 
-            if (matchRoom.getMatchStatus() == MatchStatus.WAITING && matchRoom.getMatchType() == MatchType.CHAT) {
+            if (matchRoom.getMatchStatus() == MatchStatus.WAITING && matchRoom.getMatchType() == matchType) {
                 return true;
             }
         }
@@ -82,7 +82,7 @@ public class MatchService {
     public MatchRoomResponse startChatMatch(User user, ChatRequest chatRequest) {
         log.info("startChatMatch: {}", chatRequest.getCapacity());
         // 이미 매칭중인 유저인지 확인
-        if (isChatMatched(user)) {
+        if (isMatched(user, MatchType.CHAT)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 매칭중인 유저입니다.");
         }
         // 매칭 방 찾기
@@ -119,7 +119,7 @@ public class MatchService {
             log.error("matchRoomRepository.save(matchRoom) error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 생성 에러");
         }
-        if (matchListRepository.findByMatchRoom_Id(matchRoom.getId()).isPresent()) {
+        if (matchListRepository.findByMatchRoom_IdAndUser_Id(matchRoom.getId(), user.getId()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 매칭중인 유저입니다.");
         }
         MatchList matchList = MatchList.builder()
@@ -145,21 +145,20 @@ public class MatchService {
     public void stopChatMatch(User user) {
         try {
             // 매칭중인 유저가 아니면 오류
-            if (!isChatMatched(user)) {
+            if (!isMatched(user, MatchType.CHAT)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭중인 유저가 아닙니다.");
             }
             // 유저를 기준으로 매치 룸을 찾음
             List<MatchList> userMatchLists = matchListRepository.findByUser_Id(user.getId());
             for (MatchList matchList : userMatchLists) {
                 MatchRoom matchRoom = matchList.getMatchRoom();
-                // 매칭 상태가 'WAITING'이고 에는 해당 유저의 매칭리스트 삭제, 사이즈에 맞춰 매치 룸도 삭제
-                if (matchRoom.getMatchStatus() == MatchStatus.WAITING) {
-                    if (matchRoom.getSize() == 1) { //사이즈가 1인 경우, matchRoom에서도 삭제
-                        matchListRepository.deleteById(matchList.getId());
+                if (matchRoom.getMatchType() == MatchType.CHAT) {
+                    matchRoom.setSize(matchRoom.getSize() - 1);
+                    matchListRepository.deleteById(matchList.getId());
+                    if (matchRoom.getSize() == 0) {
                         matchRoomRepository.deleteById(matchRoom.getId());
-                    } else { //사이즈를 1 줄임
-                        matchRoom.setSize(matchRoom.getSize() - 1);
-                        matchListRepository.deleteById(matchList.getId());
+                    } else {
+                        matchRoomRepository.save(matchRoom);
                     }
                 }
             }
