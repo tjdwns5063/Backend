@@ -142,41 +142,34 @@ public class MatchService {
                 .build();
     }
 
-    /* startChatMatch에 로직을 추가하여 일단 여기는 주석 처리 */
-//    public void waitingMatchRoom(User user, ChatRequest chatRequest) {
-//        MatchRoom waitingMatchRoom = matchRoomRepository.findByMatchStatusAndMatchType(MatchStatus.WAITING, MatchType.CHAT);
-//        if (waitingMatchRoom == null) {
-//            System.out.println(chatRequest.getCapacity());
-//            startChatMatch(user, chatRequest);
-//        } else {
-//            MatchList matchList = MatchList.builder()
-//                    .user(user)
-//                    .matchRoom(waitingMatchRoom)
-//                    .build();
-//            changeMatchstatus(waitingMatchRoom);
-//            try {
-//                matchListRepository.save(matchList);
-//            } catch (Exception e) {
-//                log.error("matchListRepository.save(matchList) error: {}", e.getMessage());
-//                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 리스트 생성 에러");
-//            }
-//        }
-//    }
-
-    public void changeMatchstatus(MatchRoom matchRoom) {
-        int count = matchListRepository.countByMatchRoom(matchRoom);
-
-        if (count == matchRoom.getCapacity()) {
-            matchRoom.setMatchStatus(MatchStatus.MATCHED);
-        } else {
-            matchRoom.setMatchStatus(MatchStatus.WAITING);
+    public void stopChatMatch(User user) {
+        try {
+            // 매칭중인 유저가 아니면 오류
+            if (!isChatMatched(user)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭중인 유저가 아닙니다.");
+            }
+            // 유저를 기준으로 매치 룸을 찾음
+            List<MatchList> userMatchLists = matchListRepository.findByUser_Id(user.getId());
+            for (MatchList matchList : userMatchLists) {
+                MatchRoom matchRoom = matchList.getMatchRoom();
+                // 매칭 상태가 'WAITING'이고 에는 해당 유저의 매칭리스트 삭제, 사이즈에 맞춰 매치 룸도 삭제
+                if (matchRoom.getMatchStatus() == MatchStatus.WAITING) {
+                    if (matchRoom.getSize() == 1) { //사이즈가 1인 경우, matchRoom에서도 삭제
+                        matchListRepository.deleteById(matchList.getId());
+                        matchRoomRepository.deleteById(matchRoom.getId());
+                    } else { //사이즈를 1 줄임
+                        matchRoom.setSize(matchRoom.getSize() - 1);
+                        matchListRepository.deleteById(matchList.getId());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("stopChatMatch error: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 중단 에러");
         }
 
-        matchRoomRepository.save(matchRoom);
     }
-    public void stopChatMatch(User user) {
 
-    }
 
     public MatchRoomResponse getMatchRoomInfo(Long id) {
         return null;

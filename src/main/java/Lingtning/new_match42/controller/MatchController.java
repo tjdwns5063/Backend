@@ -61,14 +61,4 @@ public class MatchController {
         matchService.stopChatMatch(user);
     }
 
-    /* /chat/start 로직에 반영하여 일단 여기는 주석 처리 */
-//    @PostMapping("/chat/waiting")
-//    @Operation(summary = "대기 중인 채팅 매칭 확인 API", description = "대기 중인 채팅 매칭이 있는지 확인하는 API", responses = {
-//            @ApiResponse(responseCode = "200", description = "대기 중인 채팅 매칭 시작 완료")
-//    })
-//    public void waitingChatMatch(Authentication authentication, ChatRequest chatRequest) {
-//        System.out.println(chatRequest.getCapacity());
-//        User user = userService.getUser(authentication);
-//        matchService.waitingMatchRoom(user, chatRequest);
-//    }
 }
