@@ -15,6 +15,8 @@ server:
     include-message: always
 
 spring:
+  pid:
+    file: boot-paas.pid
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
