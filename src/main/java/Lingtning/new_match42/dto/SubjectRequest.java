@@ -9,5 +9,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @ToString
-public class ChatRequest extends MatchRequest{
+public class SubjectRequest extends MatchRequest{
+    private String project;
 }

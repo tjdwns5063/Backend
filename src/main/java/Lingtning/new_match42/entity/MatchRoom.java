@@ -30,9 +30,6 @@ public class MatchRoom {
     private Integer size;
 
     @Column(nullable = false)
-    private Integer capacity;
-
-    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private MatchType matchType;
 
@@ -43,13 +40,18 @@ public class MatchRoom {
     @OneToMany(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private List<MatchList> matchList = new ArrayList<>();
 
+    @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
+    private ChatOption chatOption;
+
+    @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
+    private SubjectOption subjectOption;
+
     @CreatedDate
     private LocalDateTime createdDate;
 
     @Builder
-    public MatchRoom(Integer size, Integer capacity, MatchType matchType, MatchStatus matchStatus) {
+    public MatchRoom(Integer size, MatchType matchType, MatchStatus matchStatus) {
         this.size = size;
-        this.capacity = capacity;
         this.matchType = matchType;
         this.matchStatus = matchStatus;
     }

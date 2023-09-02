@@ -1,13 +1,12 @@
 package Lingtning.new_match42.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
 @ToString
-public class ChatRequest extends MatchRequest{
+public class MatchRequest {
+    private Integer capacity;
 }

@@ -11,6 +11,4 @@ import java.util.Optional;
 @Repository
 public interface UserConnectInterestRepository extends JpaRepository<UserConnectInterest, Long> {
     List<UserConnectInterest> findByUser_Id(Long userId);
-
-    Optional<UserConnectInterest> findByUser_IdAndInterest_Id(Long userId, Long InterestId);
 }

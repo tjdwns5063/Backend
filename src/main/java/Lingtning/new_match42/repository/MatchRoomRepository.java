@@ -12,12 +12,4 @@ import java.util.Optional;
 
 @Repository
 public interface MatchRoomRepository extends JpaRepository<MatchRoom, Long> {
-    MatchRoom findByMatchStatusAndMatchType(MatchStatus matchStatus, MatchType matchType);
-    List<MatchRoom> findByMatchType(MatchType matchType);
-
-    List<MatchRoom> findByMatchTypeAndMatchStatus(MatchType matchType, MatchStatus matchStatus);
-
-    List<MatchRoom> findByMatchTypeAndMatchStatusOrderByCreatedDate(MatchType matchType, MatchStatus matchStatus);
-
-    Optional<MatchRoom> findTopByMatchTypeAndMatchStatusAndCapacityOrderByCreatedDate(MatchType matchType, MatchStatus matchStatus, Integer capacity);
 }

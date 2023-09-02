@@ -11,11 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface MatchListRepository extends JpaRepository<MatchList, Long> {
-    int countByMatchRoom(MatchRoom matchRoom);
-
     List<MatchList> findByUser_Id(Long userId);
-
     List<MatchList> findByMatchRoom_Id(Long matchRoomId);
-
-    Optional<MatchList> findByMatchRoom_IdAndUser_Id(Long roomId, Long userId);
+    void deleteByUser_IdAndMatchRoom_Id(Long userId, Long roomId);
 }
