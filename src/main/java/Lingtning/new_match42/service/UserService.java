@@ -42,7 +42,7 @@ public class UserService {
         try {
             User user = (User) authentication.getPrincipal();
             return userRepository.findById(user.getId()).orElseThrow(()
-                    -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
+                    -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다!"));
         } catch (Exception e) {
             throw new ResponseStatusException(NOT_FOUND, "로그인 되어 있지 않습니다.");
         }
