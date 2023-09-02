@@ -31,8 +31,7 @@ public class FirebaseController {
     })
     public String  helloFirebase() {
         // FirebaseService를 통한 작업 수행
-        String firebaseData = firebaseService.readAndWriteData().toString(); // 예시로 Firebase 데이터를 가져온다고 가정
-        return firebaseData; // Firebase 데이터를 반환
+        return firebaseService.readAndWriteData().toString(); // Firebase 데이터를 반환
     }
 
     @PostMapping("/token/subscribe")

@@ -97,6 +97,7 @@ public class FCMService {
             sendChatMessage(user.getFcmToken(), "FCM 토큰 등록에 성공했습니다.");
             userRepository.save(user);
         } catch (Exception e) {
+            user.setFcmToken(null);
             throw new ResponseStatusException(INTERNAL_SERVER_ERROR, "FCM 토큰 등록에 실패했습니다.");
         }
         return ResponseEntity.ok("FCM 토큰 등록에 성공했습니다.");
