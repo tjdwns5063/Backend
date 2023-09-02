@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,17 +43,17 @@ public class FirebaseController {
     @Operation(summary = "FCM 토큰 등록 API", description = "FCM 토큰을 등록하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "FCM 토큰 등록 완료")
     })
-    public void subscribeToken(Authentication authentication, @RequestParam String token) {
+    public ResponseEntity<?> subscribeToken(Authentication authentication, @RequestParam String token) {
         User user = userService.getUser(authentication);
-        fcmService.subscribeToken(user, token);
+        return fcmService.subscribeToken(user, token);
     }
 
     @PostMapping("/message/send/{userId}")
     @Operation(summary = "FCM 메시지 전송 API", description = "FCM 메시지를 전송하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "FCM 메시지 전송 완료")
     })
-    public void sendChatMessage(@PathVariable Long userId, @RequestParam String message) {
+    public ResponseEntity<?> sendChatMessage(@PathVariable Long userId, @RequestParam String message) {
         User user = userService.getUser(userId);
-        fcmService.sendChatMessage(user, message);
+        return fcmService.sendChatMessage(user.getFcmToken(), message);
     }
 }
