@@ -13,7 +13,7 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
     @Bean
-    public FirebaseApp myFirebase() throws IOException {
+    public FirebaseMessaging firebaseMessaging() throws IOException {
         InputStream serviceAccount = FirebaseConfig.class.getResourceAsStream("/firebase-adminsdk.json");
         if (serviceAccount == null) {
             throw new IOException("Firebase Admin SDK File Not Found");
@@ -22,11 +22,7 @@ public class FirebaseConfig {
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
 
-        return FirebaseApp.initializeApp(options);
-    }
-
-    @Bean
-    public FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {
+        FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
         return FirebaseMessaging.getInstance(firebaseApp);
     }
 }

@@ -12,7 +12,6 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.messaging.*;
 import jakarta.transaction.Transactional;
@@ -38,7 +37,6 @@ public class FirebaseService {
     private final MatchListRepository matchListRepository;
     private final MatchRoomRepository matchRoomRepository;
     private final FirebaseMessaging firebaseMessaging;
-    private final FirebaseApp firebaseApp;
     private final UserRepository userRepository;
 
     // user에게 message를 보내는 함수
@@ -124,7 +122,7 @@ public class FirebaseService {
     }
 
     public void createChatRoomInFireBase(Long roomId) {
-        final Firestore client = FirestoreClient.getFirestore(firebaseApp);
+        final Firestore client = FirestoreClient.getFirestore();
 
         // 데이터베이스에서 필요한 정보를 조회
         List<MatchList> matchLists = matchListRepository.findByMatchRoom_Id(roomId); // 모든 MatchList 레코드 조회
