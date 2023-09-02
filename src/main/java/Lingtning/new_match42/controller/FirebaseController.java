@@ -50,6 +50,6 @@ public class FirebaseController {
     })
     public ResponseEntity<?> sendChatMessage(@PathVariable Long userId, @RequestParam String message) {
         User user = userService.getUser(userId);
-        return fcmService.sendChatMessage(user, message);
+        return fcmService.sendChatMessage(user.getFcmToken(), message);
     }
 }
