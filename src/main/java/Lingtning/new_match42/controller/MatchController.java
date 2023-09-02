@@ -72,8 +72,8 @@ public class MatchController {
     }
 
     @PostMapping("/subject/start")
-    @Operation(summary = "채팅 매칭 시작 API", description = "채팅 매칭을 시작하는 API", responses = {
-            @ApiResponse(responseCode = "200", description = "채팅 매칭 시작 완료")
+    @Operation(summary = "과제 매칭 시작 API", description = "과제 매칭을 시작하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "과제 매칭 시작 완료")
     })
     public MatchRoomResponse startSubjectMatch(Authentication authentication, @RequestBody SubjectRequest subjectRequest) {
         User user = userService.getUser(authentication);
@@ -85,8 +85,8 @@ public class MatchController {
     }
 
     @PostMapping("/subject/stop")
-    @Operation(summary = "채팅 매칭 종료 API", description = "채팅 매칭을 종료하는 API", responses = {
-            @ApiResponse(responseCode = "200", description = "채팅 매칭 종료 완료")
+    @Operation(summary = "과제 매칭 종료 API", description = "과제 매칭을 종료하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "과제 매칭 종료 완료")
     })
     public void stopSubjectMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
