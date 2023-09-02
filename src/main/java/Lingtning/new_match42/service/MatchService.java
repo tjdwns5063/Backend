@@ -89,7 +89,7 @@ public class MatchService {
         MatchRoom matchRoom = matchRoomRepository.findTopByMatchTypeAndMatchStatusAndCapacityOrderByCreatedDate(
                 MatchType.CHAT, MatchStatus.WAITING, chatRequest.getCapacity()).orElse(null);
         if (matchRoom != null) { // 매칭 방을 찾았다면
-            log.info("matchRoom: {}", matchRoom.getId());
+            log.info("matchRoom1: {}", matchRoom.getId());
             matchRoom.setSize(matchRoom.getSize() + 1);
             if (Objects.equals(matchRoom.getSize(), matchRoom.getCapacity())) {
                 matchRoom.setMatchStatus(MatchStatus.MATCHED);
@@ -102,9 +102,11 @@ public class MatchService {
                     .matchStatus(MatchStatus.WAITING)
                     .build();
         }
+        log.info("matchRoom2: {}", matchRoom.getId());
         try {
             if (matchRoom.getMatchStatus().equals(MatchStatus.WAITING)) {
                 matchRoom = matchRoomRepository.save(matchRoom);
+            log.info("matchRoom: {}", matchRoom);
             } else if (matchRoom.getMatchStatus().equals(MatchStatus.MATCHED)) {
                 return MatchRoomResponse.builder()
                         .id(matchRoom.getId())
@@ -125,12 +127,14 @@ public class MatchService {
                 .user(user)
                 .matchRoom(matchRoom)
                 .build();
+        log.info("matchList: {}", matchList);
         try {
             matchListRepository.save(matchList);
         } catch (Exception e) {
             log.error("matchListRepository.save(matchList) error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 리스트 생성 에러");
         }
+        log.info("succses");
 
         return MatchRoomResponse.builder()
                 .id(matchRoom.getId())

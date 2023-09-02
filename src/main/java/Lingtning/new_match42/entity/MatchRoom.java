@@ -5,6 +5,7 @@ import Lingtning.new_match42.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = "matchList")
+@EntityListeners(AuditingEntityListener.class)
 public class MatchRoom {
     @Id
     @GeneratedValue(strategy = IDENTITY)
