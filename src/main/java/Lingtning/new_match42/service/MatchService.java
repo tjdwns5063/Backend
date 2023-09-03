@@ -8,9 +8,11 @@ import Lingtning.new_match42.dto.response.MatchRoomResponse;
 import Lingtning.new_match42.dto.response.UserMatchInfoResponse;
 import Lingtning.new_match42.entity.match.*;
 import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.entity.user.UserConnectBlockUser;
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import Lingtning.new_match42.repository.match.*;
+import Lingtning.new_match42.repository.user.UserConnectBlockUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,8 @@ public class MatchService {
     private final ChatOptionRepository chatOptionRepository;
     private final SubjectOptionRepository subjectOptionRepository;
     private final MealOptionRepository mealOptionRepository;
+
+    private final UserConnectBlockUserRepository userConnectBlockUserRepository;
 
     public UserMatchInfoResponse getMatchInfo(User user) {
         List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
@@ -81,78 +85,126 @@ public class MatchService {
                 .build());
     }
 
-    MatchRoom chooseMatchRoom(MatchType matchType, MatchRequest matchRequest) {
+    private boolean isBlockRelation(List<MatchList> matchList, List<UserConnectBlockUser> blockingList, List<UserConnectBlockUser> blockedList) {
+        for (MatchList match : matchList) {
+            User target = match.getUser();
+
+            for (UserConnectBlockUser userConnectBlockUser : blockingList) {
+                if (userConnectBlockUser.getBlockUser().getId().equals(target.getId())) {
+                    return true;
+                }
+            }
+            for (UserConnectBlockUser userConnectBlockUser : blockedList) {
+                if (userConnectBlockUser.getUser().getId().equals(target.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private MatchRoom chooseMatchRoom(User user, MatchType matchType, MatchRequest matchRequest) {
+        // 차단 관계 리스트
+        List<UserConnectBlockUser> blockingList = userConnectBlockUserRepository.findByUser_Id(user.getId());
+        List<UserConnectBlockUser> blockedList = userConnectBlockUserRepository.findByBlockUser_Id(user.getId());
+
         if (matchType == MatchType.CHAT) {
             ChatRequest chatRequest = (ChatRequest) matchRequest;
-            ChatOption chatOption = chatOptionRepository.findTopByCapacity(chatRequest.getCapacity()).orElse(null);
+            List<ChatOption> chatOptionList = chatOptionRepository.findByCapacity(chatRequest.getCapacity());
+
+            // 차단 관계 확인해서 방 찾기
+            for (ChatOption chatOption : chatOptionList) {
+                MatchRoom matchRoom = chatOption.getMatchRoom();
+                List<MatchList> matchList = matchListRepository.findByMatchRoom_Id(matchRoom.getId());
+
+                if (isBlockRelation(matchList, blockingList, blockedList)) {
+                    continue;
+                }
+
+                if (matchRoom.getMatchStatus() == MatchStatus.WAITING) {
+                    matchRoom.setSize(matchRoom.getSize() + 1);
+
+                    if (Objects.equals(matchRoom.getSize(), chatOption.getCapacity())) {
+                        matchRoom.setMatchStatus(MatchStatus.MATCHED);
+                    }
+
+                    return matchRoom;
+                }
+            }
 
             // 찾는 매칭 방이 없다면
-            if (chatOption == null) {
-                MatchRoom matchRoom = saveNewMatchRoom(matchType);
-                chatOptionRepository.save(ChatOption.builder()
-                        .matchRoom(matchRoom)
-                        .capacity(chatRequest.getCapacity())
-                        .build());
-
-                return matchRoom;
-            }
-            // 찾는 매칭 방이 있다면
-            MatchRoom matchRoom = chatOption.getMatchRoom();
-            matchRoom.setSize(matchRoom.getSize() + 1);
-
-            if (Objects.equals(matchRoom.getSize(), chatOption.getCapacity())) {
-                matchRoom.setMatchStatus(MatchStatus.MATCHED);
-            }
+            MatchRoom matchRoom = saveNewMatchRoom(matchType);
+            chatOptionRepository.save(ChatOption.builder()
+                    .matchRoom(matchRoom)
+                    .capacity(chatRequest.getCapacity())
+                    .build());
 
             return matchRoom;
 
         } else if (matchType == MatchType.SUBJECT) {
             SubjectRequest subjectRequest = (SubjectRequest) matchRequest;
-            SubjectOption subjectOption = subjectOptionRepository.findTopByCapacityAndProject(subjectRequest.getCapacity(), subjectRequest.getProject()).orElse(null);
+            List<SubjectOption> subjectOptionList = subjectOptionRepository.findByCapacityAndProject(subjectRequest.getCapacity(), subjectRequest.getProject());
+
+            // 차단 관계 확인해서 방 찾기
+            for (SubjectOption subjectOption : subjectOptionList) {
+                MatchRoom matchRoom = subjectOption.getMatchRoom();
+                List<MatchList> matchList = matchListRepository.findByMatchRoom_Id(matchRoom.getId());
+
+                if (isBlockRelation(matchList, blockingList, blockedList)) {
+                    continue;
+                }
+
+                if (matchRoom.getMatchStatus() == MatchStatus.WAITING) {
+                    matchRoom.setSize(matchRoom.getSize() + 1);
+
+                    if (Objects.equals(matchRoom.getSize(), subjectOption.getCapacity())) {
+                        matchRoom.setMatchStatus(MatchStatus.MATCHED);
+                    }
+
+                    return matchRoom;
+                }
+            }
 
             // 찾는 매칭 방이 없다면
-            if (subjectOption == null) {
-                MatchRoom matchRoom = saveNewMatchRoom(matchType);
-                subjectOptionRepository.save(SubjectOption.builder()
-                        .matchRoom(matchRoom)
-                        .capacity(subjectRequest.getCapacity())
-                        .project(subjectRequest.getProject())
-                        .build());
-
-                return matchRoom;
-            }
-            // 찾는 매칭 방이 있다면
-            MatchRoom matchRoom = subjectOption.getMatchRoom();
-            matchRoom.setSize(matchRoom.getSize() + 1);
-
-            if (Objects.equals(matchRoom.getSize(), subjectOption.getCapacity())) {
-                matchRoom.setMatchStatus(MatchStatus.MATCHED);
-            }
+            MatchRoom matchRoom = saveNewMatchRoom(matchType);
+            subjectOptionRepository.save(SubjectOption.builder()
+                    .matchRoom(matchRoom)
+                    .capacity(subjectRequest.getCapacity())
+                    .project(subjectRequest.getProject())
+                    .build());
 
             return matchRoom;
 
         } else if (matchType == MatchType.MEAL) {
             MealRequest mealRequest = (MealRequest) matchRequest;
-            MealOption mealOption = mealOptionRepository.findTopByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu()).orElse(null);
+            List<MealOption> mealOptionList = mealOptionRepository.findByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu());
 
+            // 차단 관계 확인해서 방 찾기
+            for (MealOption mealOption : mealOptionList) {
+                MatchRoom matchRoom = mealOption.getMatchRoom();
+                List<MatchList> matchList = matchListRepository.findByMatchRoom_Id(matchRoom.getId());
+
+                if (isBlockRelation(matchList, blockingList, blockedList)) {
+                    continue;
+                }
+
+                if (matchRoom.getMatchStatus() == MatchStatus.WAITING) {
+                    matchRoom.setSize(matchRoom.getSize() + 1);
+
+                    if (Objects.equals(matchRoom.getSize(), mealOption.getCapacity())) {
+                        matchRoom.setMatchStatus(MatchStatus.MATCHED);
+                    }
+
+                    return matchRoom;
+                }
+            }
             // 찾는 매칭 방이 없다면
-            if (mealOption == null) {
-                MatchRoom matchRoom = saveNewMatchRoom(matchType);
-                mealOptionRepository.save(MealOption.builder()
-                        .matchRoom(matchRoom)
-                        .capacity(mealRequest.getCapacity())
-                        .menu(mealRequest.getMenu())
-                        .build());
-
-                return matchRoom;
-            }
-            // 찾는 매칭 방이 있다면
-            MatchRoom matchRoom = mealOption.getMatchRoom();
-            matchRoom.setSize(matchRoom.getSize() + 1);
-
-            if (Objects.equals(matchRoom.getSize(), mealOption.getCapacity())) {
-                matchRoom.setMatchStatus(MatchStatus.MATCHED);
-            }
+            MatchRoom matchRoom = saveNewMatchRoom(matchType);
+            mealOptionRepository.save(MealOption.builder()
+                    .matchRoom(matchRoom)
+                    .capacity(mealRequest.getCapacity())
+                    .menu(mealRequest.getMenu())
+                    .build());
 
             return matchRoom;
 
@@ -171,27 +223,14 @@ public class MatchService {
         MatchRoom matchRoom = null;
         try {
             // 매칭 방이 없으면 새로 만들고, 있으면 사이즈를 늘리고 매칭 상태를 바꿈
-            matchRoom = chooseMatchRoom(matchType, matchRequest);
+            matchRoom = chooseMatchRoom(user, matchType, matchRequest);
         } catch (Exception e) {
             log.error("chooseMatchRoom error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 방 찾기 에러");
         }
 
         try {
-            // 매칭 중 이라면
-            if (matchRoom.getMatchStatus().equals(MatchStatus.WAITING)) {
-                matchRoom = matchRoomRepository.save(matchRoom);
-                log.info("matchRoom: {}", matchRoom);
-            // 매칭 완료 되었다면 매칭 리스트 추가 없이 바로 리턴
-            } else if (matchRoom.getMatchStatus().equals(MatchStatus.MATCHED)) {
-                return MatchRoomResponse.builder()
-                        .id(matchRoom.getId())
-                        .size(matchRoom.getSize())
-                        .capacity(matchRequest.getCapacity())
-                        .matchType(matchType.getKey())
-                        .matchStatus("MATCHED")
-                        .build();
-            }
+            matchRoom = matchRoomRepository.save(matchRoom);
         } catch (Exception e) {
             log.error("matchRoomRepository.save(matchRoom) error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 룸 생성 에러");
@@ -213,7 +252,7 @@ public class MatchService {
                 .size(matchRoom.getSize())
                 .capacity(matchRequest.getCapacity())
                 .matchType(matchType.getKey())
-                .matchStatus("WAITING")
+                .matchStatus(matchRoom.getMatchStatus().getKey())
                 .build();
     }
 

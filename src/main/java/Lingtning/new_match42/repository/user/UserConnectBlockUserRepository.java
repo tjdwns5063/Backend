@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface UserConnectBlockUserRepository extends JpaRepository<UserConnectBlockUser, Long> {
     List<UserConnectBlockUser> findByUser_Id(Long userId);
+
+    List<UserConnectBlockUser> findByBlockUser_Id(Long userId);
 }

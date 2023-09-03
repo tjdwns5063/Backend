@@ -12,9 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class NewMatch42Application {
 
 	public static void main(String[] args) {
-		SpringApplication application = new SpringApplication(NewMatch42Application.class);
-		application.addListeners(new ApplicationPidFileWriter());
-		application.run(args);
+		SpringApplication.run(NewMatch42Application.class, args);
 	}
 
 	/* Cors 설정 */
@@ -26,7 +24,6 @@ public class NewMatch42Application {
 				registry.addMapping("/**")
 						.allowedOrigins("/*")
 						.allowedHeaders("*")
-//						.allowedOrigins("http://" + System.getenv("NCP_IP") + ":" + System.getenv("REACT_PORT"), "http://localhost:" + System.getenv("REACT_PORT"))
 						.allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
 						.allowCredentials(true);
 			}
