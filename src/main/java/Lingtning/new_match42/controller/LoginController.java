@@ -1,13 +1,10 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j(topic = "LoginController")

@@ -1,4 +1,4 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.user;
 
 import Lingtning.new_match42.enums.Role;
 import jakarta.persistence.*;

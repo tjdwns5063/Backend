@@ -1,8 +1,8 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.dto.UserInterestResponse;
-import Lingtning.new_match42.dto.UserResponse;
-import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.dto.response.UserInterestResponse;
+import Lingtning.new_match42.dto.response.UserResponse;
+import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

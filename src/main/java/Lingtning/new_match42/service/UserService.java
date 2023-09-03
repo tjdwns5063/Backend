@@ -1,15 +1,15 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.dto.UserInterestResponse;
-import Lingtning.new_match42.dto.UserResponse;
-import Lingtning.new_match42.entity.Interest;
-import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.entity.UserConnectBlockUser;
-import Lingtning.new_match42.entity.UserConnectInterest;
-import Lingtning.new_match42.repository.InterestRepository;
-import Lingtning.new_match42.repository.UserConnectBlockUserRepository;
-import Lingtning.new_match42.repository.UserConnectInterestRepository;
-import Lingtning.new_match42.repository.UserRepository;
+import Lingtning.new_match42.dto.response.UserInterestResponse;
+import Lingtning.new_match42.dto.response.UserResponse;
+import Lingtning.new_match42.entity.user.Interest;
+import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.entity.user.UserConnectBlockUser;
+import Lingtning.new_match42.entity.user.UserConnectInterest;
+import Lingtning.new_match42.repository.user.InterestRepository;
+import Lingtning.new_match42.repository.user.UserConnectBlockUserRepository;
+import Lingtning.new_match42.repository.user.UserConnectInterestRepository;
+import Lingtning.new_match42.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -42,7 +42,7 @@ public class UserService {
         try {
             User user = (User) authentication.getPrincipal();
             return userRepository.findById(user.getId()).orElseThrow(()
-                    -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
+                    -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다!"));
         } catch (Exception e) {
             throw new ResponseStatusException(NOT_FOUND, "로그인 되어 있지 않습니다.");
         }

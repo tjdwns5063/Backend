@@ -1,8 +1,10 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
 
+import Lingtning.new_match42.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Setter
 @NoArgsConstructor(access = PROTECTED)
 @ToString
+@EntityListeners(AuditingEntityListener.class)
 public class MatchList {
     @Id
     @GeneratedValue(strategy = IDENTITY)

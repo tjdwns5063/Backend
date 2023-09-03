@@ -1,6 +1,6 @@
-package Lingtning.new_match42.repository;
+package Lingtning.new_match42.repository.user;
 
-import Lingtning.new_match42.entity.Interest;
+import Lingtning.new_match42.entity.user.Interest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,10 +1,11 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
 
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = "matchList")
+@EntityListeners(AuditingEntityListener.class)
 public class MatchRoom {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -26,9 +28,6 @@ public class MatchRoom {
 
     @Column(nullable = false)
     private Integer size;
-
-    @Column(nullable = false)
-    private Integer capacity;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -41,13 +40,18 @@ public class MatchRoom {
     @OneToMany(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private List<MatchList> matchList = new ArrayList<>();
 
+    @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
+    private ChatOption chatOption;
+
+    @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
+    private SubjectOption subjectOption;
+
     @CreatedDate
     private LocalDateTime createdDate;
 
     @Builder
-    public MatchRoom(Integer size, Integer capacity, MatchType matchType, MatchStatus matchStatus) {
+    public MatchRoom(Integer size, MatchType matchType, MatchStatus matchStatus) {
         this.size = size;
-        this.capacity = capacity;
         this.matchType = matchType;
         this.matchStatus = matchStatus;
     }

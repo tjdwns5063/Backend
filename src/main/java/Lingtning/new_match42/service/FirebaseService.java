@@ -1,11 +1,10 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.entity.MatchList;
-import Lingtning.new_match42.entity.MatchRoom;
-import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.repository.MatchListRepository;
-import Lingtning.new_match42.repository.MatchRoomRepository;
-import Lingtning.new_match42.repository.UserRepository;
+import Lingtning.new_match42.entity.match.MatchList;
+import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.repository.match.MatchListRepository;
+import Lingtning.new_match42.repository.match.MatchRoomRepository;
+import Lingtning.new_match42.repository.user.UserRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
@@ -17,7 +16,6 @@ import com.google.firebase.messaging.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -121,7 +119,7 @@ public class FirebaseService {
         return ResponseEntity.ok("FCM 토큰 등록에 성공했습니다.");
     }
 
-    public void createChatRoomInFireBase(Long roomId) {
+    public void createRoomInFireBase(Long roomId, String matchType) {
         final Firestore client = FirestoreClient.getFirestore();
 
         // 데이터베이스에서 필요한 정보를 조회
@@ -131,11 +129,6 @@ public class FirebaseService {
         for (MatchList matchList : matchLists) {
             userIds.add(matchList.getUser().getId()); // 유저 아이디를 리스트에 추가
         }
-
-        MatchRoom matchRoom = matchRoomRepository.findById(roomId).orElseThrow(() -> (
-                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "해당하는 매칭 방이 없습니다.")
-        )) ; // 매칭 방 조회
-
         // 매칭 방 삭제
         matchRoomRepository.deleteById(roomId);
 
@@ -154,7 +147,7 @@ public class FirebaseService {
 
         chatRoomData.put("name", "test");
         chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
-        chatRoomData.put("type", matchRoom.getMatchType().toString()); // match_room 테이블의 match_type 값을 사용
+        chatRoomData.put("type", matchType); // match_room 테이블의 match_type 값을 사용
 
         // users 배열 초기화=
         List<Long> users = new ArrayList<>();
