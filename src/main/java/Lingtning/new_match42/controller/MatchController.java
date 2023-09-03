@@ -14,26 +14,19 @@ import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/match")
+@RequiredArgsConstructor
 @Tag(name = "Match", description = "매칭 관련 API")
 public class MatchController {
     private final UserService userService;
     private final MatchService matchService;
-    private FirebaseService firebaseService;
-
-    @Autowired
-    public MatchController(UserService userService, MatchService matchService, FirebaseService firebaseService) {
-        this.userService = userService;
-        this.firebaseService = firebaseService; // FirebaseService 주입
-        this.matchService = matchService;
-
-    }
-
+    private final FirebaseService firebaseService;
 
     @GetMapping("/me")
     @Operation(summary = "매칭 정보 반환 API", description = "현재 매칭 정보를 반환하는 API", responses = {
