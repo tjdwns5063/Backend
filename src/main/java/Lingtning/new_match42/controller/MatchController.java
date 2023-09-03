@@ -50,7 +50,7 @@ public class MatchController {
     @Operation(summary = "채팅 매칭 시작 API", description = "채팅 매칭을 시작하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "채팅 매칭 시작 완료")
     })
-    public MatchRoomResponse startChatMatch(Authentication authentication, @RequestBody ChatRequest matchRequest) {
+    public synchronized MatchRoomResponse startChatMatch(Authentication authentication, @RequestBody ChatRequest matchRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, matchRequest, MatchType.CHAT);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
@@ -63,7 +63,7 @@ public class MatchController {
     @Operation(summary = "채팅 매칭 종료 API", description = "채팅 매칭을 종료하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "채팅 매칭 종료 완료")
     })
-    public void stopChatMatch(Authentication authentication) {
+    public synchronized void stopChatMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
         matchService.stopMatch(user, MatchType.CHAT);
     }
@@ -72,7 +72,7 @@ public class MatchController {
     @Operation(summary = "과제 매칭 시작 API", description = "과제 매칭을 시작하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "과제 매칭 시작 완료")
     })
-    public MatchRoomResponse startSubjectMatch(Authentication authentication, @RequestBody SubjectRequest subjectRequest) {
+    public synchronized MatchRoomResponse startSubjectMatch(Authentication authentication, @RequestBody SubjectRequest subjectRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, subjectRequest, MatchType.SUBJECT);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
@@ -85,7 +85,7 @@ public class MatchController {
     @Operation(summary = "과제 매칭 종료 API", description = "과제 매칭을 종료하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "과제 매칭 종료 완료")
     })
-    public void stopSubjectMatch(Authentication authentication) {
+    public synchronized void stopSubjectMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
         matchService.stopMatch(user, MatchType.SUBJECT);
     }
@@ -94,7 +94,7 @@ public class MatchController {
     @Operation(summary = "식사 매칭 시작 API", description = "식사 매칭을 시작하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "식사 매칭 시작 완료")
     })
-    public MatchRoomResponse startMealMatch(Authentication authentication, @RequestBody MealRequest mealRequest) {
+    public synchronized MatchRoomResponse startMealMatch(Authentication authentication, @RequestBody MealRequest mealRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, mealRequest, MatchType.MEAL);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
@@ -107,7 +107,7 @@ public class MatchController {
     @Operation(summary = "식사 매칭 종료 API", description = "식사 매칭을 종료하는 API", responses = {
             @ApiResponse(responseCode = "200", description = "식사 매칭 종료 완료")
     })
-    public void stopMealMatch(Authentication authentication) {
+    public synchronized void stopMealMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
         matchService.stopMatch(user, MatchType.MEAL);
     }

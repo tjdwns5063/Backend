@@ -128,7 +128,7 @@ public class MatchService {
                         matchRoom.setMatchStatus(MatchStatus.MATCHED);
                     }
 
-                    return matchRoom;
+                    return matchRoomRepository.save(matchRoom);
                 }
             }
 
@@ -139,7 +139,7 @@ public class MatchService {
                     .capacity(chatRequest.getCapacity())
                     .build());
 
-            return matchRoom;
+            return matchRoomRepository.save(matchRoom);
 
         } else if (matchType == MatchType.SUBJECT) {
             SubjectRequest subjectRequest = (SubjectRequest) matchRequest;
@@ -161,7 +161,7 @@ public class MatchService {
                         matchRoom.setMatchStatus(MatchStatus.MATCHED);
                     }
 
-                    return matchRoom;
+                    return matchRoomRepository.save(matchRoom);
                 }
             }
 
@@ -173,7 +173,7 @@ public class MatchService {
                     .project(subjectRequest.getProject())
                     .build());
 
-            return matchRoom;
+            return matchRoomRepository.save(matchRoom);
 
         } else if (matchType == MatchType.MEAL) {
             MealRequest mealRequest = (MealRequest) matchRequest;
@@ -195,7 +195,7 @@ public class MatchService {
                         matchRoom.setMatchStatus(MatchStatus.MATCHED);
                     }
 
-                    return matchRoom;
+                    return matchRoomRepository.save(matchRoom);
                 }
             }
             // 찾는 매칭 방이 없다면
@@ -206,7 +206,7 @@ public class MatchService {
                     .menu(mealRequest.getMenu())
                     .build());
 
-            return matchRoom;
+            return matchRoomRepository.save(matchRoom);
 
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭 타입이 잘못되었습니다.");
@@ -227,13 +227,6 @@ public class MatchService {
         } catch (Exception e) {
             log.error("chooseMatchRoom error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 방 찾기 에러");
-        }
-
-        try {
-            matchRoom = matchRoomRepository.save(matchRoom);
-        } catch (Exception e) {
-            log.error("matchRoomRepository.save(matchRoom) error: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "매칭 룸 생성 에러");
         }
 
         try {
