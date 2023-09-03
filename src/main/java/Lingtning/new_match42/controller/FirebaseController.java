@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static Lingtning.new_match42.enums.MatchType.CHAT;
+
 /** test **/
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class FirebaseController {
     public List<Map<String, Object>> helloFirebase() {
         // FirebaseService를 통한 작업 수행
         List<Map<String, Object>> firebaseDataList = firebaseService.readAllDataFromRoomsCollection();
-        firebaseService.createChatRoomInFireBase(1L);/////
+        firebaseService.createRoomInFireBase(1L, CHAT.getKey());
         return firebaseDataList; // 모든 Firebase 데이터를 반환
     }
 
