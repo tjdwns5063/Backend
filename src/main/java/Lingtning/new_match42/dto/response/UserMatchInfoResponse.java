@@ -1,4 +1,4 @@
-package Lingtning.new_match42.dto;
+package Lingtning.new_match42.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,6 @@ import java.util.List;
 @ToString
 public class UserMatchInfoResponse {
     private Long id;
-
     private Long mealMatchId;
     private Long subjectMatchId;
     private Long chatMatchId;

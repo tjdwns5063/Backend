@@ -1,6 +1,6 @@
-package Lingtning.new_match42.repository;
+package Lingtning.new_match42.repository.user;
 
-import Lingtning.new_match42.entity.UserConnectBlockUser;
+import Lingtning.new_match42.entity.user.UserConnectBlockUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

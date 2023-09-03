@@ -1,6 +1,6 @@
-package Lingtning.new_match42.repository;
+package Lingtning.new_match42.repository.match;
 
-import Lingtning.new_match42.entity.SubjectOption;
+import Lingtning.new_match42.entity.match.SubjectOption;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

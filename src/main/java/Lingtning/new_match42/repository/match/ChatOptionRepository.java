@@ -1,10 +1,8 @@
-package Lingtning.new_match42.repository;
+package Lingtning.new_match42.repository.match;
 
-import Lingtning.new_match42.entity.ChatOption;
-import Lingtning.new_match42.entity.MatchRoom;
+import Lingtning.new_match42.entity.match.ChatOption;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ChatOptionRepository extends JpaRepository<ChatOption, Long> {

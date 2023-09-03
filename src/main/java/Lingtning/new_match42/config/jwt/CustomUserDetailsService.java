@@ -1,6 +1,6 @@
 package Lingtning.new_match42.config.jwt;
 
-import Lingtning.new_match42.repository.UserRepository;
+import Lingtning.new_match42.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

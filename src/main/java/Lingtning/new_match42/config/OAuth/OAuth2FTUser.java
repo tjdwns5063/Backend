@@ -1,6 +1,6 @@
 package Lingtning.new_match42.config.OAuth;
 
-import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.entity.user.User;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

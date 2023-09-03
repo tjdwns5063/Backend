@@ -1,4 +1,4 @@
-package Lingtning.new_match42.dto;
+package Lingtning.new_match42.dto.request;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;

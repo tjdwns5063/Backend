@@ -1,4 +1,4 @@
-package Lingtning.new_match42.dto;
+package Lingtning.new_match42.dto.response;
 
 import Lingtning.new_match42.enums.Role;
 import lombok.Builder;

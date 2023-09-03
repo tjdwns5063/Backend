@@ -1,5 +1,6 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
 
+import Lingtning.new_match42.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

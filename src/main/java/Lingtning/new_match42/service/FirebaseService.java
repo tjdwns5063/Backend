@@ -1,10 +1,10 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.entity.MatchList;
-import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.repository.MatchListRepository;
-import Lingtning.new_match42.repository.MatchRoomRepository;
-import Lingtning.new_match42.repository.UserRepository;
+import Lingtning.new_match42.entity.match.MatchList;
+import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.repository.match.MatchListRepository;
+import Lingtning.new_match42.repository.match.MatchRoomRepository;
+import Lingtning.new_match42.repository.user.UserRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;

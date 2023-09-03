@@ -1,6 +1,6 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.service.FirebaseService;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

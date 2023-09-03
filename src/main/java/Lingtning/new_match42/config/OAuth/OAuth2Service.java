@@ -1,8 +1,8 @@
 package Lingtning.new_match42.config.OAuth;
 
 import Lingtning.new_match42.enums.Role;
-import Lingtning.new_match42.entity.User;
-import Lingtning.new_match42.repository.UserRepository;
+import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

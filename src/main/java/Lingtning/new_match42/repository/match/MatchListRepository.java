@@ -1,13 +1,10 @@
-package Lingtning.new_match42.repository;
+package Lingtning.new_match42.repository.match;
 
-import Lingtning.new_match42.entity.MatchList;
-import Lingtning.new_match42.entity.MatchRoom;
-import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.entity.match.MatchList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MatchListRepository extends JpaRepository<MatchList, Long> {

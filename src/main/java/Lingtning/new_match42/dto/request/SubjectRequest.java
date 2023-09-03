@@ -1,5 +1,6 @@
-package Lingtning.new_match42.dto;
+package Lingtning.new_match42.dto.request;
 
+import Lingtning.new_match42.dto.request.MatchRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,5 +12,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @ToString
-public class ChatRequest extends MatchRequest{
+public class SubjectRequest extends MatchRequest {
+    private String project;
 }

@@ -1,4 +1,5 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
+
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,26 +7,30 @@ import lombok.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "chat_option")
+@Table(name = "meal_option")
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString
-public class ChatOption {
+public class MealOption {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+    Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_room_id", nullable = false)
-    private MatchRoom matchRoom;
+    MatchRoom matchRoom;
 
     @Column(nullable = false)
-    private Integer capacity;
+    Integer capacity;
+
+    @Column(nullable = false)
+    String menu;
 
     @Builder
-    public ChatOption(MatchRoom matchRoom, Integer capacity) {
+    public MealOption(MatchRoom matchRoom, Integer capacity, String menu) {
         this.matchRoom = matchRoom;
         this.capacity = capacity;
+        this.menu = menu;
     }
 }

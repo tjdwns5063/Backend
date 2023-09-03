@@ -1,4 +1,4 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
 
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;

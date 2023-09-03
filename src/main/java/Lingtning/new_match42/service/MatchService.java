@@ -1,13 +1,16 @@
 package Lingtning.new_match42.service;
 
-import Lingtning.new_match42.dto.*;
-import Lingtning.new_match42.entity.*;
+import Lingtning.new_match42.dto.request.ChatRequest;
+import Lingtning.new_match42.dto.request.MatchRequest;
+import Lingtning.new_match42.dto.request.MealRequest;
+import Lingtning.new_match42.dto.request.SubjectRequest;
+import Lingtning.new_match42.dto.response.MatchRoomResponse;
+import Lingtning.new_match42.dto.response.UserMatchInfoResponse;
+import Lingtning.new_match42.entity.match.*;
+import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
-import Lingtning.new_match42.repository.ChatOptionRepository;
-import Lingtning.new_match42.repository.MatchRoomRepository;
-import Lingtning.new_match42.repository.MatchListRepository;
-import Lingtning.new_match42.repository.SubjectOptionRepository;
+import Lingtning.new_match42.repository.match.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ public class MatchService {
     private final MatchListRepository matchListRepository;
     private final ChatOptionRepository chatOptionRepository;
     private final SubjectOptionRepository subjectOptionRepository;
+    private final MealOptionRepository mealOptionRepository;
 
     public UserMatchInfoResponse getMatchInfo(User user) {
         List<MatchList> matchList = matchListRepository.findByUser_Id(user.getId());
@@ -82,7 +86,8 @@ public class MatchService {
             ChatRequest chatRequest = (ChatRequest) matchRequest;
             ChatOption chatOption = chatOptionRepository.findTopByCapacity(chatRequest.getCapacity()).orElse(null);
 
-            if (chatOption == null) {  // 찾는 매칭 방이 없다면
+            // 찾는 매칭 방이 없다면
+            if (chatOption == null) {
                 MatchRoom matchRoom = saveNewMatchRoom(matchType);
                 chatOptionRepository.save(ChatOption.builder()
                         .matchRoom(matchRoom)
@@ -105,6 +110,7 @@ public class MatchService {
             SubjectRequest subjectRequest = (SubjectRequest) matchRequest;
             SubjectOption subjectOption = subjectOptionRepository.findTopByCapacityAndProject(subjectRequest.getCapacity(), subjectRequest.getProject()).orElse(null);
 
+            // 찾는 매칭 방이 없다면
             if (subjectOption == null) {
                 MatchRoom matchRoom = saveNewMatchRoom(matchType);
                 subjectOptionRepository.save(SubjectOption.builder()
@@ -125,8 +131,33 @@ public class MatchService {
 
             return matchRoom;
 
+        } else if (matchType == MatchType.MEAL) {
+            MealRequest mealRequest = (MealRequest) matchRequest;
+            MealOption mealOption = mealOptionRepository.findTopByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu()).orElse(null);
+
+            // 찾는 매칭 방이 없다면
+            if (mealOption == null) {
+                MatchRoom matchRoom = saveNewMatchRoom(matchType);
+                mealOptionRepository.save(MealOption.builder()
+                        .matchRoom(matchRoom)
+                        .capacity(mealRequest.getCapacity())
+                        .menu(mealRequest.getMenu())
+                        .build());
+
+                return matchRoom;
+            }
+            // 찾는 매칭 방이 있다면
+            MatchRoom matchRoom = mealOption.getMatchRoom();
+            matchRoom.setSize(matchRoom.getSize() + 1);
+
+            if (Objects.equals(matchRoom.getSize(), mealOption.getCapacity())) {
+                matchRoom.setMatchStatus(MatchStatus.MATCHED);
+            }
+
+            return matchRoom;
+
         } else {
-            return null; // 아직 밥 매칭은 구현 안함
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭 타입이 잘못되었습니다.");
         }
     }
 
@@ -147,9 +178,11 @@ public class MatchService {
         }
 
         try {
+            // 매칭 중 이라면
             if (matchRoom.getMatchStatus().equals(MatchStatus.WAITING)) {
                 matchRoom = matchRoomRepository.save(matchRoom);
                 log.info("matchRoom: {}", matchRoom);
+            // 매칭 완료 되었다면 매칭 리스트 추가 없이 바로 리턴
             } else if (matchRoom.getMatchStatus().equals(MatchStatus.MATCHED)) {
                 return MatchRoomResponse.builder()
                         .id(matchRoom.getId())
@@ -165,6 +198,7 @@ public class MatchService {
         }
 
         try {
+            // 매칭 리스트 추가
             matchListRepository.save(MatchList.builder()
                     .user(user)
                     .matchRoom(matchRoom)

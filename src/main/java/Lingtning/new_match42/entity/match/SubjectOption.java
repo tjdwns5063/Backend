@@ -1,10 +1,8 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.match;
 
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
-
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -13,7 +11,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Setter
 @NoArgsConstructor(access = PROTECTED)
-@ToString()
+@ToString
 public class SubjectOption {
     @Id
     @GeneratedValue(strategy = IDENTITY)

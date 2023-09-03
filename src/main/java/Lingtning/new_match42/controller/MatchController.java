@@ -1,7 +1,11 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.dto.*;
-import Lingtning.new_match42.entity.User;
+import Lingtning.new_match42.dto.request.ChatRequest;
+import Lingtning.new_match42.dto.request.MealRequest;
+import Lingtning.new_match42.dto.request.SubjectRequest;
+import Lingtning.new_match42.dto.response.MatchRoomResponse;
+import Lingtning.new_match42.dto.response.UserMatchInfoResponse;
+import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MatchType;
 import Lingtning.new_match42.service.FirebaseService;
@@ -91,6 +95,28 @@ public class MatchController {
     public void stopSubjectMatch(Authentication authentication) {
         User user = userService.getUser(authentication);
         matchService.stopMatch(user, MatchType.SUBJECT);
+    }
+
+    @PostMapping("/meal/start")
+    @Operation(summary = "식사 매칭 시작 API", description = "식사 매칭을 시작하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "식사 매칭 시작 완료")
+    })
+    public MatchRoomResponse startMealMatch(Authentication authentication, @RequestBody MealRequest mealRequest) {
+        User user = userService.getUser(authentication);
+        MatchRoomResponse matchRoomResponse = matchService.startMatch(user, mealRequest, MatchType.MEAL);
+        if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
+            firebaseService.createRoomInFireBase(matchRoomResponse.getId(), matchRoomResponse.getMatchType());
+        }
+        return matchRoomResponse;
+    }
+
+    @PostMapping("/meal/stop")
+    @Operation(summary = "식사 매칭 종료 API", description = "식사 매칭을 종료하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "식사 매칭 종료 완료")
+    })
+    public void stopMealMatch(Authentication authentication) {
+        User user = userService.getUser(authentication);
+        matchService.stopMatch(user, MatchType.MEAL);
     }
 }
 

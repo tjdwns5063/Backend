@@ -1,4 +1,4 @@
-package Lingtning.new_match42.dto;
+package Lingtning.new_match42.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

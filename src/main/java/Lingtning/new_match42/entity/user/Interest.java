@@ -1,5 +1,6 @@
-package Lingtning.new_match42.entity;
+package Lingtning.new_match42.entity.user;
 
+import Lingtning.new_match42.entity.user.UserConnectInterest;
 import jakarta.persistence.*;
 import lombok.*;
 
