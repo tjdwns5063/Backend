@@ -156,17 +156,17 @@ public class FirebaseService {
         chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
         chatRoomData.put("type", matchRoom.getMatchType().toString()); // match_room 테이블의 match_type 값을 사용
 
-        // users 필드 초기화
-        Map<String, Long> users = new HashMap<>();
-        for (int i = 0; i < userIds.size(); ++i) {
-            users.put(String.valueOf(i), userIds.get(i));
+        // users 배열 초기화=
+        List<Long> users = new ArrayList<>();
+        for (Long userId : userIds) {
+            users.add(userId);
         }
         chatRoomData.put("users", users);
 
-        // unread 필드 초기화
-        Map<String, Integer> unread = new HashMap<>();
-        for (Long userId : userIds) {
-            unread.put(String.valueOf(userId), 0);
+        // unread 배열 초기화==
+        List<Long> unread = new ArrayList<>();
+        for (int i = 0; i < userIds.size(); i++) {
+            unread.add(0L);
         }
         chatRoomData.put("unread", unread);
 

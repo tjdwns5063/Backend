@@ -27,6 +27,7 @@ public class FirebaseController {
     private final FirebaseService firebaseService;
     private final UserService userService;
 
+    //match_list 1번 id만 firebase에 넣어보는 테스트. firebase모든 데이터 반환.
     @GetMapping("/test")
     @Operation(summary = "Hello!", description = "처음으로 만든 API", responses = {
             @ApiResponse(responseCode = "200", description = "야호! 성공!!!")
@@ -34,6 +35,7 @@ public class FirebaseController {
     public List<Map<String, Object>> helloFirebase() {
         // FirebaseService를 통한 작업 수행
         List<Map<String, Object>> firebaseDataList = firebaseService.readAllDataFromRoomsCollection();
+        firebaseService.createChatRoomInFireBase(1L);/////
         return firebaseDataList; // 모든 Firebase 데이터를 반환
     }
 
