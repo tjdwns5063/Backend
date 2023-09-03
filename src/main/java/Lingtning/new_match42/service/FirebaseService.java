@@ -138,7 +138,7 @@ public class FirebaseService {
             put("data", null);
             put("message", null);
             put("sender", new HashMap<String, Object>() {{
-                put("id", null);
+                put("id", 0);
                 put("intra", "");
                 put("nickname", "");
                 put("profile", "");
