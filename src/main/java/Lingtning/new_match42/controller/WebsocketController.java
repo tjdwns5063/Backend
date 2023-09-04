@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@Slf4j
+@Slf4j(topic = "WEBSOCKET")
 @RequiredArgsConstructor
 public class WebsocketController {
     private final SimpMessageSendingOperations messagingTemplate;
