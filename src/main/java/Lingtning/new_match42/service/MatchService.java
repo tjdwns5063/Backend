@@ -177,7 +177,12 @@ public class MatchService {
 
         } else if (matchType == MatchType.MEAL) {
             MealRequest mealRequest = (MealRequest) matchRequest;
-            List<MealOption> mealOptionList = mealOptionRepository.findByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu());
+            List<MealOption> mealOptionList;
+            if (mealRequest.getMenu().equals("any")) {
+                mealOptionList = mealOptionRepository.findByCapacity(mealRequest.getCapacity());
+            } else {
+                mealOptionList = mealOptionRepository.findByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu());
+            }
 
             // 차단 관계 확인해서 방 찾기
             for (MealOption mealOption : mealOptionList) {

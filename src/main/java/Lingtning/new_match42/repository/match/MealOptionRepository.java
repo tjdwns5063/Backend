@@ -12,4 +12,6 @@ public interface MealOptionRepository extends JpaRepository<MealOption, Long> {
     Optional<MealOption> findTopByCapacityAndMenu(Integer capacity, String menu);
 
     List<MealOption> findByCapacityAndMenu(Integer capacity, String menu);
+
+    List<MealOption> findByCapacity(Integer capacity);
 }
