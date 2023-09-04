@@ -41,6 +41,7 @@ public class SecurityConfig {
             // websocket
             "/ws/**",
             "/message/**",
+            "/room_name/**",
             // error
             "/error"
     };
@@ -63,10 +64,10 @@ public class SecurityConfig {
     protected SecurityFilterChain myConfig(HttpSecurity http) throws Exception {
         /* 허용 페이지 등록 */
         http.authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
-//                        .requestMatchers(USER_ACCESS_LIST).hasRole("USER")  // USER 권한 필요 경로
-//                        .requestMatchers(ADMIN_ACCESS_LIST).hasRole("ADMIN")  // ADMIN 권한 필요 경로
-                        .anyRequest().permitAll())  // 그 외 나머지 경로는 전부 인증 필요
+                        .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
+                        .requestMatchers(USER_ACCESS_LIST).hasRole("USER")  // USER 권한 필요 경로
+                        .requestMatchers(ADMIN_ACCESS_LIST).hasRole("ADMIN")  // ADMIN 권한 필요 경로
+                        .anyRequest().authenticated())  // 그 외 나머지 경로는 전부 인증 필요
                 // 예외 처리
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
