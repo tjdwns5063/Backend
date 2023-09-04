@@ -250,13 +250,13 @@ public class MatchService {
     }
 
     public void stopMatch(User user, MatchType matchType) {
-        try {
-            // 매칭중인 유저가 아니면 오류
-            MatchRoom matchRoom = isMatched(user, matchType);
-            if (matchRoom == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭중인 유저가 아닙니다.");
-            }
+        // 매칭중인 유저가 아니면 오류
+        MatchRoom matchRoom = isMatched(user, matchType);
+        if (matchRoom == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭중인 유저가 아닙니다.");
+        }
 
+        try {
             matchListRepository.deleteByUser_IdAndMatchRoom_Id(user.getId(), matchRoom.getId());
             matchRoom.setSize(matchRoom.getSize() - 1);
 

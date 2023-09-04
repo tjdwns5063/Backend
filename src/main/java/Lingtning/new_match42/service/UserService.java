@@ -247,4 +247,14 @@ public class UserService {
                 .interests(interestList)
                 .build();
     }
+
+    public List<String> getIntra(Long[] useridList) {
+        List<String> intraList = new ArrayList<>();
+        for (Long userid : useridList) {
+            User user = userRepository.findById(userid).orElseThrow(()
+                    -> new ResponseStatusException(NOT_FOUND, "찾을 수 없는 유저가 있습니다."));
+            intraList.add(user.getIntra());
+        }
+        return intraList;
+    }
 }

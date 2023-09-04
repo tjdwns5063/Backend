@@ -38,6 +38,10 @@ public class SecurityConfig {
             "/api/v1/login/success",
             // logout
             "/api/v1/logout",
+            // websocket
+            "/ws/**",
+            "/message/**",
+            "/room_name/**",
             // error
             "/error"
     };
