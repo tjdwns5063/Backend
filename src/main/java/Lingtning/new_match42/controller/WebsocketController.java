@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebsocketController {
     private final SimpMessageSendingOperations messagingTemplate;
-    private final UserService userService;
     private final static List<String> users = new ArrayList<>();
 
     // 새로운 사용자가 웹 소켓을 연결할 때 실행됨
