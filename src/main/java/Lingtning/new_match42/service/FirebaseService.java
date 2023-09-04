@@ -222,6 +222,7 @@ public class FirebaseService {
                 match = client.collection("match").document();
                 matchRoomRepository.findById(matchRoomResponse.getId()).ifPresent(matchRoom -> {
                     matchRoom.setFirebaseMatchId(match.getId());
+                    matchRoomResponse.setFirebaseMatchId(match.getId());
                     matchRoomRepository.save(matchRoom);
                 });
             } else {
