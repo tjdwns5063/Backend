@@ -136,7 +136,7 @@ public class FirebaseService {
         // 채팅방 데이터 생성 및 Firestore에 추가
         Map<String, Object> chatRoomData = new HashMap<>();
         chatRoomData.put("lastMsg", new HashMap<String, Object>() {{
-            put("data", null);
+            put("date", null);
             put("message", null);
             put("sender", new HashMap<String, Object>() {{
                 put("id", 0);
