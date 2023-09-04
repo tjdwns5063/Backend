@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping("/api/v1/match")
 @RequiredArgsConstructor
@@ -53,6 +55,7 @@ public class MatchController {
     public synchronized MatchRoomResponse startChatMatch(Authentication authentication, @RequestBody ChatRequest matchRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, matchRequest, MatchType.CHAT);
+        firebaseService.createMatchInFireBase(matchRoomResponse);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
             firebaseService.createRoomInFireBase(matchRoomResponse.getId(), matchRoomResponse.getMatchType());
         }
@@ -75,6 +78,7 @@ public class MatchController {
     public synchronized MatchRoomResponse startSubjectMatch(Authentication authentication, @RequestBody SubjectRequest subjectRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, subjectRequest, MatchType.SUBJECT);
+        firebaseService.createMatchInFireBase(matchRoomResponse);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
             firebaseService.createRoomInFireBase(matchRoomResponse.getId(), matchRoomResponse.getMatchType());
         }
@@ -97,6 +101,7 @@ public class MatchController {
     public synchronized MatchRoomResponse startMealMatch(Authentication authentication, @RequestBody MealRequest mealRequest) {
         User user = userService.getUser(authentication);
         MatchRoomResponse matchRoomResponse = matchService.startMatch(user, mealRequest, MatchType.MEAL);
+        firebaseService.createMatchInFireBase(matchRoomResponse);
         if (matchRoomResponse.getMatchStatus().equals(MatchStatus.MATCHED.getKey())) {
             firebaseService.createRoomInFireBase(matchRoomResponse.getId(), matchRoomResponse.getMatchType());
         }

@@ -15,4 +15,5 @@ public class MatchRoomResponse {
     private Integer capacity;
     private String matchType;
     private String matchStatus;
+    private String firebaseMatchId;
 }

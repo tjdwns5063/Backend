@@ -1,5 +1,6 @@
 package Lingtning.new_match42.service;
 
+import Lingtning.new_match42.dto.response.MatchRoomResponse;
 import Lingtning.new_match42.entity.match.MatchList;
 import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.repository.match.MatchListRepository;
@@ -7,10 +8,7 @@ import Lingtning.new_match42.repository.match.MatchRoomRepository;
 import Lingtning.new_match42.repository.user.UserRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.messaging.*;
 import jakarta.transaction.Transactional;
@@ -212,6 +210,39 @@ public class FirebaseService {
             e.printStackTrace();
         }
         return dataList; // firebase 데이터 전체 리턴
+    }
+
+    public void createMatchInFireBase(MatchRoomResponse matchRoomResponse) {
+        final Firestore client = FirestoreClient.getFirestore();
+        String firebaseMatchId = matchRoomResponse.getFirebaseMatchId();
+
+        DocumentReference match;
+        try {
+            if (firebaseMatchId == null) {
+                match = client.collection("match").document();
+                matchRoomRepository.findById(matchRoomResponse.getId()).ifPresent(matchRoom -> {
+                    matchRoom.setFirebaseMatchId(match.getId());
+                    matchRoomRepository.save(matchRoom);
+                });
+            } else {
+                match = client.collection("match").document(firebaseMatchId);
+            }
+
+            // 매칭방 데이터 생성 및 Firestore에 추가
+            Map<String, Object> matchData = new HashMap<>();
+            matchData.put("id", matchRoomResponse.getId());
+            matchData.put("size", matchRoomResponse.getSize());
+            matchData.put("capacity", matchRoomResponse.getCapacity());
+            matchData.put("matchType", matchRoomResponse.getMatchType());
+            matchData.put("matchStatus", matchRoomResponse.getMatchStatus());
+
+            ApiFuture<WriteResult> updateMatch = match.set(matchData);
+            log.info("Update time : " + updateMatch.get().getUpdateTime());
+        } catch (Exception e) {
+            log.error("Error: " + e.getMessage());
+        }
+
+        log.info("Match Created DONE");
     }
 }
 

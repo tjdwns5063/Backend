@@ -37,6 +37,9 @@ public class MatchRoom {
     @Enumerated(value = EnumType.STRING)
     private MatchStatus matchStatus;
 
+    @Column
+    private String firebaseMatchId;
+
     @OneToMany(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private List<MatchList> matchList = new ArrayList<>();
 

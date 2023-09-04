@@ -251,6 +251,7 @@ public class MatchService {
                 .capacity(matchRequest.getCapacity())
                 .matchType(matchType.getKey())
                 .matchStatus(matchRoom.getMatchStatus().getKey())
+                .firebaseMatchId(matchRoom.getFirebaseMatchId())
                 .build();
     }
 
