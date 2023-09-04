@@ -83,7 +83,6 @@ public class WebsocketController {
     @MessageMapping("/getRoomInfo")
     @SendTo("/room_name/public/${}")
     public void getRoomInfo(@Payload WebsocketMatchDto message) {
-        message.setSize(message.getSize() + 1);
         // 매칭이 완료되면
         log.info("Message : " + message);
         if (message.getSize() < message.getCapacity()) {
