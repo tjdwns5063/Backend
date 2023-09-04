@@ -81,7 +81,6 @@ public class WebsocketController {
 
     // /message/getRoomInfo로 요청이 들어오면 해당 메소드로 처리된다.
     @MessageMapping("/getRoomInfo")
-    @SendTo("/room_name/public/${}")
     public void getRoomInfo(@Payload WebsocketMatchDto message) {
         // 매칭이 완료되면
         log.info("Message : " + message);
