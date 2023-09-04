@@ -46,6 +46,9 @@ public class MatchRoom {
     @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
     private SubjectOption subjectOption;
 
+    @OneToOne(mappedBy = "matchRoom", cascade = CascadeType.ALL)
+    private MealOption mealOption;
+
     @CreatedDate
     private LocalDateTime createdDate;
 

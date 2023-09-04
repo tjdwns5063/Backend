@@ -28,7 +28,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
-@Slf4j
+@Slf4j(topic = "FIREBASE_SERVICE")
 @RequiredArgsConstructor
 @Transactional
 public class FirebaseService {
@@ -73,7 +73,7 @@ public class FirebaseService {
     }
 
     // user들에게 한번에 message를 보내는 함수
-    public ResponseEntity<?> broadCastChatMessage(List<String> tokens, String message) {
+    public ResponseEntity<?> broadCastChatMessage(List<String> tokens, String message, String firebaseId) {
         if (tokens == null || tokens.isEmpty()) {
             throw new ResponseStatusException(BAD_REQUEST, "알림을 받을 대상에게 FCM 토큰이 없습니다.");
         }
@@ -83,6 +83,7 @@ public class FirebaseService {
                 .build();
 
         MulticastMessage fcmMessage = MulticastMessage.builder()
+                .putData("firebase-id", firebaseId)
                 .setNotification(notification)
                 .setAndroidConfig(AndroidConfig.builder()
                         .setTtl(3600 * 1000)
@@ -167,6 +168,11 @@ public class FirebaseService {
         try {
             // 채팅방 생성
             ApiFuture<DocumentReference> result = client.collection("rooms").add(chatRoomData);
+            String resultId = result.get().getId(); // 채팅방 ID
+            log.info("Chat Room Created with ID: " + resultId);
+            String resultPath = result.get().getPath(); // 채팅방 경로
+            log.info("Chat Room Path: " + resultPath);
+
             // 매칭 알림 보내기
             List<String> tokens = new ArrayList<>();
             userRepository.findAllById(userIds).forEach(user -> {
@@ -174,7 +180,7 @@ public class FirebaseService {
                     tokens.add(user.getFcmToken());
                 }
             });
-            broadCastChatMessage(tokens, "매칭이 성사되었습니다.");
+            broadCastChatMessage(tokens, "매칭이 성사되었습니다.", resultId);
             log.info("Chat Room Created with ID: " + result.get().getId());
         } catch (Exception e) {
             log.error("Error: " + e.getMessage());
