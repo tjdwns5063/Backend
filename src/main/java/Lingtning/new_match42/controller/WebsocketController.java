@@ -1,9 +1,9 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.dto.response.WebsocketDto;
-import Lingtning.new_match42.entity.user.User;
+import Lingtning.new_match42.dto.WebsocketMatchDto;
+import Lingtning.new_match42.dto.WebsocketDto;
+import Lingtning.new_match42.enums.MatchStatus;
 import Lingtning.new_match42.enums.MessageType;
-import Lingtning.new_match42.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -13,7 +13,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -78,5 +77,21 @@ public class WebsocketController {
         users.add(message.getSender());
         log.info("User Added : " + message.getSender());
         return message;
+    }
+
+    // /message/getRoomInfo로 요청이 들어오면 해당 메소드로 처리된다.
+    @MessageMapping("/getRoomInfo")
+    @SendTo("/room_name/public/${}")
+    public void getRoomInfo(@Payload WebsocketMatchDto message) {
+        message.setSize(message.getSize() + 1);
+        // 매칭이 완료되면
+        log.info("Message : " + message);
+        if (message.getSize() < message.getCapacity()) {
+            log.info("match complete");
+            message.setMatchStatus(MatchStatus.MATCHED.getKey());
+            messagingTemplate.convertAndSend("/room_name/public/" + message.getId(), message);
+
+        }
+        messagingTemplate.convertAndSend("/room_name/public/" + message.getId(), message);
     }
 }

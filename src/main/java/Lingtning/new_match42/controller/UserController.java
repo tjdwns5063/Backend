@@ -32,6 +32,14 @@ public class UserController {
         User user = userService.getUser(authentication);
         return userService.getMe(user);
     }
+    // 유저들 intra 조회 API
+    @GetMapping("/intra")
+    @Operation(summary = "유저들 intra 조회 API", description = "유저들 intra 조회 API", responses = {
+            @ApiResponse(responseCode = "200", description = "유저들 intra 조회 완료")
+    })
+    public List<String> getIntra(@RequestBody Long[] useridList) {
+        return userService.getIntra(useridList);
+    }
 
     @GetMapping("/interest/{userId}")
     @Operation(summary = "유저의 관심사 조회 API", description = "유저의 관심사 조회 API", responses = {

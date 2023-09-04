@@ -1,4 +1,4 @@
-package Lingtning.new_match42.dto.response;
+package Lingtning.new_match42.dto;
 
 import Lingtning.new_match42.enums.MessageType;
 import lombok.AllArgsConstructor;
