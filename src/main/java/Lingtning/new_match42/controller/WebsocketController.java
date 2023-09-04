@@ -84,12 +84,10 @@ public class WebsocketController {
     public void getRoomInfo(@Payload WebsocketMatchDto message) {
         // 매칭이 완료되면
         log.info("Message : " + message);
-        if (message.getSize() < message.getCapacity()) {
+        if (message.getSize() >= message.getCapacity()) {
             log.info("match complete");
             message.setMatchStatus(MatchStatus.MATCHED.getKey());
-            messagingTemplate.convertAndSend("/room_name/public/" + message.getId(), message);
-
         }
-        messagingTemplate.convertAndSend("/room_name/public/" + message.getId(), message);
+        messagingTemplate.convertAndSend("/room_name/public/" + message.getId().toString(), message);
     }
 }
