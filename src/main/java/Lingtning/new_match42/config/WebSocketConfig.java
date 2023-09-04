@@ -15,7 +15,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	  +)메소드명에 STOMP가 들어가는 경우 통신 프로토콜인 STOMP구현에서 작동된다. */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*") // CORS 허용
+                .withSockJS();
     }
 
     /*한 클라이언트에서 다른 클라이언트로 메시지를 라우팅하는데 사용될 메시지 브로커*/
