@@ -32,12 +32,7 @@ public class WebsocketController {
     // @EventListener은 한개의 매개변수만 가질 수 있다.
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
-        User user = (User) event.getUser();
-        if (user == null) {
-            log.info("Received a new web socket connection: NULL");
-        } else {
-            log.info("Received a new web socket connection: " + user.getUsername());
-        }
+        log.info("Received a new web socket connection with event : " + event);
     }
 
     // 사용자가 웹 소켓 연결을 끊으면 실행됨
@@ -48,14 +43,14 @@ public class WebsocketController {
             return;
         }
         String username = (String) headerAccessor.getSessionAttributes().get("username");
-
+        log.info("username : " + username);
         if(username != null) {
             log.info("User Disconnected : " + username);
 
             users.remove(username);
 
-            WebsocketDto chat = new WebsocketDto(MessageType.LEAVE, null, username);
-            messagingTemplate.convertAndSend("/room_name/public", chat);
+            WebsocketDto message = new WebsocketDto(MessageType.LEAVE, null, username);
+            messagingTemplate.convertAndSend("/room_name/public", message);
         }
     }
 
@@ -63,22 +58,25 @@ public class WebsocketController {
     @MessageMapping("/sendMessage")
     @SendTo("/room_name/public")
     public WebsocketDto sendMessage(@Payload WebsocketDto message) {
+        log.info("Message : " + message);
         return message;
     }
 
     // /message/addUser로 요청이 들어오면 해당 메소드로 처리된다.
     @MessageMapping("/addUser")
     @SendTo("/room_name/public")
-    public WebsocketDto addUser(@Payload WebsocketDto chat, SimpMessageHeaderAccessor headerAccessor) {
+    public WebsocketDto addUser(@Payload WebsocketDto message, SimpMessageHeaderAccessor headerAccessor) {
         if (headerAccessor.getSessionAttributes() == null) {
+            log.info("SessionAttributes is null");
             return WebsocketDto.builder()
                     .type(MessageType.JOIN)
                     .content("fail")
-                    .sender(chat.getSender())
+                    .sender(message.getSender())
                     .build();
         }
-        headerAccessor.getSessionAttributes().put("username", chat.getSender());
-        users.add(chat.getSender());
-        return chat;
+        headerAccessor.getSessionAttributes().put("username", message.getSender());
+        users.add(message.getSender());
+        log.info("User Added : " + message.getSender());
+        return message;
     }
 }
