@@ -248,7 +248,7 @@ public class UserService {
                 .build();
     }
 
-    public List<String> getIntra(Long[] useridList) {
+    public List<String> getIntra(List<Long> useridList) {
         List<String> intraList = new ArrayList<>();
         for (Long userid : useridList) {
             User user = userRepository.findById(userid).orElseThrow(()

@@ -1,5 +1,6 @@
 package Lingtning.new_match42.controller;
 
+import Lingtning.new_match42.dto.request.UserIntraRequest;
 import Lingtning.new_match42.dto.response.UserInterestResponse;
 import Lingtning.new_match42.dto.response.UserResponse;
 import Lingtning.new_match42.entity.user.User;
@@ -37,7 +38,7 @@ public class UserController {
     @Operation(summary = "유저들 intra 조회 API", description = "유저들 intra 조회 API", responses = {
             @ApiResponse(responseCode = "200", description = "유저들 intra 조회 완료")
     })
-    public List<String> getIntra(@RequestBody Long[] useridList) {
+    public List<String> getIntra(@RequestParam List<Long> useridList) {
         return userService.getIntra(useridList);
     }
 
