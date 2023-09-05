@@ -47,7 +47,7 @@ public class FirebaseService {
                 .setBody(message)
                 .build();
 
-        MulticastMessage fcmMessage = MulticastMessage.builder()
+        Message fcmMessage = Message.builder()
                 .setNotification(notification)
                 .setAndroidConfig(AndroidConfig.builder()
                         .setTtl(3600 * 1000)
@@ -61,13 +61,19 @@ public class FirebaseService {
                         .putHeader("apns-priority", "5")
                         .putHeader("apns-topic", "com.lingtning.match42")
                         .build())
-                .addToken(token)
+                .setToken(token)
                 .build();
 
-        try { // FCM 메시지를 보내는 함수
-            firebaseMessaging.sendEachForMulticast(fcmMessage);
-        } catch (FirebaseMessagingException e) {
-            throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+        for (int i=1; i<=10; ++i) {
+            try { // FCM 메시지를 보내는 함수
+                firebaseMessaging.send(fcmMessage);
+            } catch (FirebaseMessagingException e) {
+                if (i == 10) {
+                    throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+                }
+                continue;
+            }
+            break;
         }
         return ResponseEntity.ok("FCM 메시지 전송에 성공했습니다.");
     }
@@ -82,28 +88,37 @@ public class FirebaseService {
                 .setBody(message)
                 .build();
 
-        MulticastMessage fcmMessage = MulticastMessage.builder()
-                .putData("firebase-id", firebaseId)
-                .setNotification(notification)
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setTtl(3600 * 1000)
-                        .setPriority(AndroidConfig.Priority.HIGH)
-                        .build())
-                .setApnsConfig(ApnsConfig.builder()
-                        .setAps(Aps.builder()
-                                .setContentAvailable(true)
-                                .build())
-                        .putHeader("apns-push-type", "background")
-                        .putHeader("apns-priority", "5")
-                        .putHeader("apns-topic", "com.lingtning.match42")
-                        .build())
-                .addAllTokens(tokens)
-                .build();
 
-        try { // FCM 메시지를 보내는 함수
-            firebaseMessaging.sendEachForMulticast(fcmMessage);
-        } catch (FirebaseMessagingException e) {
-            throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+        for (String token : tokens) {
+            Message fcmMessage = Message.builder()
+                    .putData("firebase-id", firebaseId)
+                    .setNotification(notification)
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setTtl(3600 * 1000)
+                            .setPriority(AndroidConfig.Priority.HIGH)
+                            .build())
+                    .setApnsConfig(ApnsConfig.builder()
+                            .setAps(Aps.builder()
+                                    .setContentAvailable(true)
+                                    .build())
+                            .putHeader("apns-push-type", "background")
+                            .putHeader("apns-priority", "5")
+                            .putHeader("apns-topic", "com.lingtning.match42")
+                            .build())
+                    .setToken(token)
+                    .build();
+
+            for (int i=1; i<=10; ++i) {
+                try { // FCM 메시지를 보내는 함수
+                    firebaseMessaging.send(fcmMessage);
+                } catch (FirebaseMessagingException e) {
+//                    if (i == 10) {
+//                        throw new ResponseStatusException(BAD_REQUEST, "FCM 메시지 전송에 실패했습니다. " + e.getMessage());
+//                    }
+                    continue;
+                }
+                break;
+            }
         }
         return ResponseEntity.ok("FCM 메시지 전송에 성공했습니다.");
     }
@@ -111,7 +126,6 @@ public class FirebaseService {
     public ResponseEntity<?> subscribeToken(User user, String token) {
         user.setFcmToken(token);
         try {
-            sendChatMessage(user.getFcmToken(), "FCM 토큰 등록에 성공했습니다.");
             userRepository.save(user);
         } catch (Exception e) {
             user.setFcmToken(null);
