@@ -149,7 +149,7 @@ public class FirebaseService {
             }});
         }});
 
-        // userIntraList를 list<String>으로 변환.
+        // userIntraList를 String으로 변환.
         String userIntraAsString = userIntraList.stream()
                 .collect(Collectors.joining(", "));
         // matchType에 따라 name 설정 확장성을 위해 3개 분기로 나눔.
