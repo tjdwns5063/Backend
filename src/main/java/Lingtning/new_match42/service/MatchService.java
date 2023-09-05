@@ -289,11 +289,11 @@ public class MatchService {
                 .firebaseMatchId(matchRoom.getFirebaseMatchId())
                 .build();
         if (matchRoom.getMatchType() == MatchType.CHAT) {
-            mealOptionRepository.findByMatchRoom_Id(id).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
+            mealOptionRepository.findByMatchRoom_Id(matchRoom.getId()).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
         } else if (matchRoom.getMatchType() == MatchType.SUBJECT) {
-            subjectOptionRepository.findByMatchRoom_Id(id).ifPresent(subjectOption -> result.setCapacity(subjectOption.getCapacity()));
+            subjectOptionRepository.findByMatchRoom_Id(matchRoom.getId()).ifPresent(subjectOption -> result.setCapacity(subjectOption.getCapacity()));
         } else if (matchRoom.getMatchType() == MatchType.MEAL) {
-            mealOptionRepository.findByMatchRoom_Id(id).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
+            mealOptionRepository.findByMatchRoom_Id(matchRoom.getId()).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
         }
         return result;
     }
