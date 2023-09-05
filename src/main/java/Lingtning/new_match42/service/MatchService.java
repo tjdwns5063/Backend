@@ -279,6 +279,22 @@ public class MatchService {
 
 
     public MatchRoomResponse getMatchRoomInfo(Long id) {
-        return null;
+        MatchRoom matchRoom = matchRoomRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭 방이 존재하지 않습니다."));
+        MatchRoomResponse result = MatchRoomResponse.builder()
+                .id(matchRoom.getId())
+                .size(matchRoom.getSize())
+                .matchType(matchRoom.getMatchType().getKey())
+                .matchStatus(matchRoom.getMatchStatus().getKey())
+                .firebaseMatchId(matchRoom.getFirebaseMatchId())
+                .build();
+        if (matchRoom.getMatchType() == MatchType.CHAT) {
+            mealOptionRepository.findByMatchRoom_Id(id).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
+        } else if (matchRoom.getMatchType() == MatchType.SUBJECT) {
+            subjectOptionRepository.findByMatchRoom_Id(id).ifPresent(subjectOption -> result.setCapacity(subjectOption.getCapacity()));
+        } else if (matchRoom.getMatchType() == MatchType.MEAL) {
+            mealOptionRepository.findByMatchRoom_Id(id).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
+        }
+        return result;
     }
 }

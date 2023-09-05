@@ -10,4 +10,6 @@ public interface SubjectOptionRepository extends JpaRepository<SubjectOption, Lo
     Optional<SubjectOption> findTopByCapacityAndProject(Integer capacity, String project);
 
     List<SubjectOption> findByCapacityAndProject(Integer capacity, String project);
+
+    Optional<SubjectOption> findByMatchRoom_Id(Long matchRoomId);
 }
