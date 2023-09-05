@@ -126,9 +126,12 @@ public class FirebaseService {
         // 데이터베이스에서 필요한 정보를 조회
         List<MatchList> matchLists = matchListRepository.findByMatchRoom_Id(roomId); // 모든 MatchList 레코드 조회
 
-        List<Long> userIds = new ArrayList<>(); // 유저 아이디를 담을 리스트
+
+        List<Long> userIds = new ArrayList<>(); // 유저 서버 아이디를 담을 리스트
+        List<String> userIntraList = new ArrayList<>(); // 유저 intra를 담을 리스트
         for (MatchList matchList : matchLists) {
             userIds.add(matchList.getUser().getId()); // 유저 아이디를 리스트에 추가
+            userIntraList.add(matchList.getUser().getIntra()); // 유저 intra를 리스트에 추가
         }
         // 매칭 방 삭제
         matchRoomRepository.deleteById(roomId);
@@ -146,19 +149,18 @@ public class FirebaseService {
             }});
         }});
 
-        // userid를 list<string>으로 변환.
-        String userIdsAsString = userIds.stream()
-                .map(Object::toString) // Long을 String으로 변환
+        // userIntraList를 list<String>으로 변환.
+        String userIntraAsString = userIntraList.stream()
                 .collect(Collectors.joining(", "));
         // matchType에 따라 name 설정 확장성을 위해 3개 분기로 나눔.
         if ("CHAT".equals(matchType)) {
             chatRoomData.put("name", "수다방");
         } else if ("SUBJECT".equals(matchType)) {
             // SUBJECT인 경우, 유저들의 아이디로 설정
-            chatRoomData.put("name", userIdsAsString);
+            chatRoomData.put("name", userIntraAsString);
         } else if ("MEAL".equals(matchType)) {
             // MEAL인 경우, 유저들의 아이디로 설정
-            chatRoomData.put("name", userIdsAsString);
+            chatRoomData.put("name", userIntraAsString);
         }
 
         chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
