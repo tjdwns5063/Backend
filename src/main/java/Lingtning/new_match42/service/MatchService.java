@@ -178,7 +178,7 @@ public class MatchService {
         } else if (matchType == MatchType.MEAL) {
             MealRequest mealRequest = (MealRequest) matchRequest;
             List<MealOption> mealOptionList;
-            if (mealRequest.getMenu().equals("any")) {
+            if (mealRequest.getMenu().equals("아무거나")) {
                 mealOptionList = mealOptionRepository.findByCapacity(mealRequest.getCapacity());
             } else {
                 mealOptionList = mealOptionRepository.findByCapacityAndMenu(mealRequest.getCapacity(), mealRequest.getMenu());
