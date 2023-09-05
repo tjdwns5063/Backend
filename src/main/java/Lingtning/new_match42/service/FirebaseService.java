@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -144,7 +146,21 @@ public class FirebaseService {
             }});
         }});
 
-        chatRoomData.put("name", "test");
+        // userid를 list<string>으로 변환.
+        String userIdsAsString = userIds.stream()
+                .map(Object::toString) // Long을 String으로 변환
+                .collect(Collectors.joining(", "));
+        // matchType에 따라 name 설정 확장성을 위해 3개 분기로 나눔.
+        if ("CHAT".equals(matchType)) {
+            chatRoomData.put("name", "수다방");
+        } else if ("SUBJECT".equals(matchType)) {
+            // SUBJECT인 경우, 유저들의 아이디로 설정
+            chatRoomData.put("name", userIdsAsString);
+        } else if ("MEAL".equals(matchType)) {
+            // MEAL인 경우, 유저들의 아이디로 설정
+            chatRoomData.put("name", userIdsAsString);
+        }
+
         chatRoomData.put("open", Timestamp.now()); // 현재 타임스탬프 사용
         chatRoomData.put("type", matchType); // match_room 테이블의 match_type 값을 사용
 
