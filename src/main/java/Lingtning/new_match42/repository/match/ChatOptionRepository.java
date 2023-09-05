@@ -10,4 +10,6 @@ public interface ChatOptionRepository extends JpaRepository<ChatOption, Long> {
     Optional<ChatOption> findTopByCapacity(Integer capacity);
 
     List<ChatOption> findByCapacity(Integer capacity);
+
+    Optional<ChatOption> findByMatchRoom_Id(Long matchRoomId);
 }

@@ -224,6 +224,11 @@ public class MatchService {
         if (isMatched(user, matchType) != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 매칭중인 유저입니다.");
         }
+        // 매칭 방 인원 예외처리
+        if (matchRequest.getCapacity() < 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "매칭 방 인원은 2명 이상이어야 합니다.");
+        }
+
         // 매칭 방 찾기
         MatchRoom matchRoom = null;
         try {
@@ -289,7 +294,7 @@ public class MatchService {
                 .firebaseMatchId(matchRoom.getFirebaseMatchId())
                 .build();
         if (matchRoom.getMatchType() == MatchType.CHAT) {
-            mealOptionRepository.findByMatchRoom_Id(matchRoom.getId()).ifPresent(mealOption -> result.setCapacity(mealOption.getCapacity()));
+            chatOptionRepository.findByMatchRoom_Id(id).ifPresent(chatOption -> result.setCapacity(chatOption.getCapacity()));
         } else if (matchRoom.getMatchType() == MatchType.SUBJECT) {
             subjectOptionRepository.findByMatchRoom_Id(matchRoom.getId()).ifPresent(subjectOption -> result.setCapacity(subjectOption.getCapacity()));
         } else if (matchRoom.getMatchType() == MatchType.MEAL) {
