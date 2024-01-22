@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### key ###
-firebase-adminsdk.json
+src/main/resources/firebase-adminsdk.json
 
 
 ## ilko ##
@@ -47,3 +47,4 @@ daemon/
 native/
 wrapper/
 boot-paas.pid
+ 
