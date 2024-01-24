@@ -1,5 +1,8 @@
 package Lingtning.new_match42.controller;
 
+import Lingtning.new_match42.dto.ChatRoomDto;
+import Lingtning.new_match42.dto.ChatCreateDto;
+import Lingtning.new_match42.dto.MatchDto;
 import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.service.FirebaseService;
 import Lingtning.new_match42.service.UserService;
@@ -8,18 +11,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
-import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import static Lingtning.new_match42.enums.MatchType.CHAT;
-
-/** test **/
+/**
+ * test
+ **/
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -29,17 +29,6 @@ public class FirebaseController {
     private final FirebaseService firebaseService;
     private final UserService userService;
 
-    //match_list 1번 id만 firebase에 넣어보는 테스트. firebase모든 데이터 반환.
-    @GetMapping("/test")
-    @Operation(summary = "Hello!", description = "처음으로 만든 API", responses = {
-            @ApiResponse(responseCode = "200", description = "야호! 성공!!!")
-    })
-    public List<Map<String, Object>> helloFirebase() {
-        // FirebaseService를 통한 작업 수행
-        List<Map<String, Object>> firebaseDataList = firebaseService.readAllDataFromRoomsCollection();
-        firebaseService.createRoomInFireBase(1L, CHAT.getKey());
-        return firebaseDataList; // 모든 Firebase 데이터를 반환
-    }
 
     @PostMapping("/token/subscribe")
     @Operation(summary = "FCM 토큰 등록 API", description = "FCM 토큰을 등록하는 API", responses = {
@@ -50,12 +39,30 @@ public class FirebaseController {
         return firebaseService.subscribeToken(user, token);
     }
 
-    @PostMapping("/message/send/{userId}")
-    @Operation(summary = "FCM 메시지 전송 API", description = "FCM 메시지를 전송하는 API", responses = {
+    @PostMapping("/message/send/chat")
+    @Operation(summary = "채팅 메세지 전송 알림", description = "채팅 메세지 전송을 알리는 알림을 보내는 API", responses = {
             @ApiResponse(responseCode = "200", description = "FCM 메시지 전송 완료")
     })
-    public ResponseEntity<?> sendChatMessage(@PathVariable Long userId, @RequestParam String message) {
-        User user = userService.getUser(userId);
-        return firebaseService.sendChatMessage(user.getFcmToken(), message);
+    public ResponseEntity<?> sendChatMessage(@RequestParam String message, @RequestBody
+            ChatRoomDto dto, Authentication authentication) {
+
+        User user = userService.getUser(authentication);
+        return firebaseService.sendChatMessage(dto, message, user);
+    }
+
+    @PostMapping("/message/send/create_chat")
+    @Operation(summary = "채팅방 생성 알림", description = "채팅방 생성을 알리는 알림을 보내는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "FCM 메시지 전송 완료")
+    })
+    public ResponseEntity<?> sendChatCreateMessage(@RequestBody ChatCreateDto dto) {
+        return firebaseService.sendChatCreateMessage(dto);
+    }
+
+    @PostMapping("/message/send/match")
+    @Operation(summary = "모두가 동의해서 매치가 됐음을 알림", description = "모두가 동의해서 매치가 됐음을 알리는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "FCM 메시지 전송 완료")
+    })
+    public ResponseEntity<?> sendMatchMessage(@RequestBody MatchDto dto) {
+        return firebaseService.sendMatchMessage(dto);
     }
 }
