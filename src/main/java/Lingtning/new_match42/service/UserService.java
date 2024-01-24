@@ -1,12 +1,15 @@
 package Lingtning.new_match42.service;
 
+import Lingtning.new_match42.dto.ReportDto;
 import Lingtning.new_match42.dto.response.UserInterestResponse;
 import Lingtning.new_match42.dto.response.UserResponse;
 import Lingtning.new_match42.entity.user.Interest;
+import Lingtning.new_match42.entity.user.Report;
 import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.entity.user.UserConnectBlockUser;
 import Lingtning.new_match42.entity.user.UserConnectInterest;
 import Lingtning.new_match42.repository.user.InterestRepository;
+import Lingtning.new_match42.repository.user.ReportRepository;
 import Lingtning.new_match42.repository.user.UserConnectBlockUserRepository;
 import Lingtning.new_match42.repository.user.UserConnectInterestRepository;
 import Lingtning.new_match42.repository.user.UserRepository;
@@ -29,12 +32,17 @@ public class UserService {
     private final InterestRepository interestRepository;
     private final UserConnectInterestRepository userConnectInterestRepository;
     private final UserConnectBlockUserRepository userConnectBlockUserRepository;
+    private final ReportRepository reportRepository;
 
-    public UserService(UserRepository userRepository, InterestRepository interestRepository, UserConnectInterestRepository userConnectInterestRepository, UserConnectBlockUserRepository userConnectBlockUserRepository) {
+    public UserService(UserRepository userRepository, InterestRepository interestRepository,
+                       UserConnectInterestRepository userConnectInterestRepository,
+                       UserConnectBlockUserRepository userConnectBlockUserRepository,
+                       ReportRepository reportRepository) {
         this.userRepository = userRepository;
         this.interestRepository = interestRepository;
         this.userConnectInterestRepository = userConnectInterestRepository;
         this.userConnectBlockUserRepository = userConnectBlockUserRepository;
+        this.reportRepository = reportRepository;
     }
 
     // 로그인 했는지 확인하고 정보 반환
@@ -256,5 +264,12 @@ public class UserService {
             intraList.add(user.getIntra());
         }
         return intraList;
+    }
+
+    public ReportDto addReport(ReportDto reportRequest) {
+        log.info("addReport Called");
+        User user = getUser(reportRequest.reportedId());
+
+        return reportRepository.save(new Report(user, reportRequest.reasons())).toReportDto();
     }
 }

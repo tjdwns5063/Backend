@@ -1,8 +1,9 @@
 package Lingtning.new_match42.controller;
 
-import Lingtning.new_match42.dto.request.UserIntraRequest;
+import Lingtning.new_match42.dto.ReportDto;
 import Lingtning.new_match42.dto.response.UserInterestResponse;
 import Lingtning.new_match42.dto.response.UserResponse;
+import Lingtning.new_match42.entity.user.Report;
 import Lingtning.new_match42.entity.user.User;
 import Lingtning.new_match42.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,5 +85,14 @@ public class UserController {
     public UserResponse deleteBlockUser(Authentication authentication, @RequestParam String blockUser) {
         User user = userService.getUser(authentication);
         return userService.deleteBlockUser(user, blockUser);
+    }
+
+    @PostMapping("/report")
+    @Operation(summary = "신고 API", description = "신고 API", responses = {
+            @ApiResponse(responseCode = "200", description = "신고 성공")
+    })
+    public ReportDto reportUser(@RequestBody ReportDto reportRequest) {
+
+        return userService.addReport(reportRequest);
     }
 }
