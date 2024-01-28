@@ -27,14 +27,14 @@ public class FirebaseService {
     private final UserRepository userRepository;
 
     // user에게 message를 보내는 함수
-    public ResponseEntity<?> sendChatMessage(ChatRoomDto dto, String message, User user) {
+    public ResponseEntity<?> sendChatMessage(ChatRoomDto dto, User user) {
         if (user.getFcmToken() == null) {
             throw new ResponseStatusException(BAD_REQUEST, "알림을 받을 대상에게 FCM 토큰이 없습니다.");
         }
 
         Notification notification = Notification.builder()
                 .setTitle(dto.name())
-                .setBody(message)
+                .setBody(dto.msg())
                 .build();
 
         List<String> tokens = dto.userIds().stream().filter((Long id) -> !id.equals(user.getId()))

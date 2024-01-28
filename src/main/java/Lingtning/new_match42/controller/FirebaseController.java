@@ -43,11 +43,11 @@ public class FirebaseController {
     @Operation(summary = "채팅 메세지 전송 알림", description = "채팅 메세지 전송을 알리는 알림을 보내는 API", responses = {
             @ApiResponse(responseCode = "200", description = "FCM 메시지 전송 완료")
     })
-    public ResponseEntity<?> sendChatMessage(@RequestParam String message, @RequestBody
+    public ResponseEntity<?> sendChatMessage(@RequestBody
             ChatRoomDto dto, Authentication authentication) {
 
         User user = userService.getUser(authentication);
-        return firebaseService.sendChatMessage(dto, message, user);
+        return firebaseService.sendChatMessage(dto, user);
     }
 
     @PostMapping("/message/send/create_chat")
