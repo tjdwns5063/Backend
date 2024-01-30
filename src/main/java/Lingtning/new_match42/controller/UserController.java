@@ -31,7 +31,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "내 정보 조회 완료")
     })
     public UserResponse getMe(Authentication authentication) {
-        User user = userService.getUser(authentication);
+        User user = (User) authentication.getPrincipal();
         return userService.getMe(user);
     }
     // 유저들 intra 조회 API

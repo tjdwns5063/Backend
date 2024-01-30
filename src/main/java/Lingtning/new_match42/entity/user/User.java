@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private List<UserConnectBlockUser> userConnectBlockUser = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Report> reporteds = new ArrayList<>();
+    private List<Report> reports = new ArrayList<>();
 
     @Column(nullable = false)
     private Long blockCount;

@@ -25,8 +25,8 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.*;
 
 @Slf4j(topic = "UserService")
-@Service
 @Transactional
+@Service
 public class UserService {
     private final UserRepository userRepository;
     private final InterestRepository interestRepository;
@@ -62,9 +62,8 @@ public class UserService {
     }
 
     public UserResponse getUserResponse(User user) {
-        if (user == null) {
-            throw new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다.");
-        }
+        User user_ = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "유저를 찾을 수 없습니다."));
 
         List<String> interestList = new ArrayList<>();
         List<String> blockUserList = new ArrayList<>();
@@ -79,13 +78,14 @@ public class UserService {
             blockUserList.add(connectBlockUser.getBlockUser().getIntra());
         }
         return UserResponse.builder()
-                .id(user.getId())
-                .intra(user.getIntra())
-                .email(user.getEmail())
+                .id(user_.getId())
+                .intra(user_.getIntra())
+                .email(user_.getEmail())
                 .interests(interestList)
                 .blockUsers(blockUserList)
-                .blockCount(user.getBlockCount())
-                .role(user.getRole())
+                .blockCount(user_.getBlockCount())
+                .role(user_.getRole())
+                .reportCount(user_.getReports().size())
                 .build();
     }
 
@@ -122,9 +122,9 @@ public class UserService {
                             -> new ResponseStatusException(NOT_FOUND, "관심사를 저장 할 수 없습니다."));
                 }
                 UserConnectInterest userConnectInterest = UserConnectInterest.builder()
-                    .user(user)
-                    .interest(findInterest)
-                    .build();
+                        .user(user)
+                        .interest(findInterest)
+                        .build();
                 log.info("userConnectInterest: " + userConnectInterest);
                 log.info("user: " + user);
                 log.info("findInterest: " + findInterest);
@@ -187,10 +187,10 @@ public class UserService {
                 -> new ResponseStatusException(NOT_FOUND, "차단할 유저를 찾을 수 없습니다."));
 
         UserConnectBlockUser connectBlockUser = UserConnectBlockUser
-            .builder()
-            .user(user)
-            .blockUser(findBlockUser)
-            .build();
+                .builder()
+                .user(user)
+                .blockUser(findBlockUser)
+                .build();
         user.setBlockCount(user.getBlockCount() + 1);
         connectBlockUserList.add(connectBlockUser);
         user.setUserConnectBlockUser(connectBlockUserList);

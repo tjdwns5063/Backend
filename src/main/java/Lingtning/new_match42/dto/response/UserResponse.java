@@ -23,4 +23,5 @@ public class UserResponse {
 
     private List<String> blockUsers;
     private Long blockCount;
+    private Integer reportCount;
 }
