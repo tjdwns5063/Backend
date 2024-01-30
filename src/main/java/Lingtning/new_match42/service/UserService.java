@@ -1,5 +1,7 @@
 package Lingtning.new_match42.service;
 
+import Lingtning.new_match42.dto.BlockInfoDto;
+import Lingtning.new_match42.dto.BlockUserDto;
 import Lingtning.new_match42.dto.ReportDto;
 import Lingtning.new_match42.dto.response.UserInterestResponse;
 import Lingtning.new_match42.dto.response.UserResponse;
@@ -82,7 +84,8 @@ public class UserService {
                 .intra(user_.getIntra())
                 .email(user_.getEmail())
                 .interests(interestList)
-                .blockUsers(blockUserList)
+                .blockUsers(user_.getUserConnectBlockUser().stream()
+                        .map((u) -> new BlockInfoDto(new BlockUserDto(u.getUser().getId(), u.getUser().getIntra()), new BlockUserDto(u.getBlockUser().getId(), u.getBlockUser().getIntra()))).toList())
                 .blockCount(user_.getBlockCount())
                 .role(user_.getRole())
                 .reportCount(user_.getReports().size())
@@ -172,12 +175,15 @@ public class UserService {
             throw new ResponseStatusException(BAD_REQUEST, "자기 자신을 차단할 수 없습니다.");
         }
 
-        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
-        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
-                throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
-            }
-        }
+        user = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "유저를 찾을 수 없습니다"));
+
+//        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
+//        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+//            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
+//                throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
+//            }
+//        }
 
         if (user.getBlockCount() == 5) {
             throw new ResponseStatusException(BAD_REQUEST, "차단할 수 있는 유저는 최대 5명까지입니다.");
@@ -191,9 +197,6 @@ public class UserService {
                 .user(user)
                 .blockUser(findBlockUser)
                 .build();
-        user.setBlockCount(user.getBlockCount() + 1);
-        connectBlockUserList.add(connectBlockUser);
-        user.setUserConnectBlockUser(connectBlockUserList);
         try {
             userConnectBlockUserRepository.save(connectBlockUser);
             userRepository.save(user);
@@ -206,33 +209,16 @@ public class UserService {
     }
 
     public UserResponse deleteBlockUser(User user, String blockUser) {
-        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
+        User _user = userRepository.findById(user.getId()).orElseThrow();
+        List<UserConnectBlockUser> blockUsers = userConnectBlockUserRepository.findByUser_Id(user.getId());
 
-        if (blockUser == null) {
-            throw new ResponseStatusException(BAD_REQUEST, "잘못된 요청입니다.");
-        } else if (blockUser.equals(user.getIntra())) {
-            throw new ResponseStatusException(BAD_REQUEST, "자기 자신을 차단 해제 할 수 없습니다.");
-        }
-
-        log.info("blockUser: " + blockUser);
-        try {
-            for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-                if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
-                    log.info("connectBlockUser: " + connectBlockUser);
-                    userConnectBlockUserRepository.deleteById(connectBlockUser.getId());
-                    user.setBlockCount(user.getBlockCount() - 1);
-                    userRepository.save(user);
-                    connectBlockUserList.remove(connectBlockUser);
-                    user.setUserConnectBlockUser(connectBlockUserList);
-                    return getUserResponse(user);
-                }
+        for (UserConnectBlockUser block: blockUsers) {
+            if (block.getBlockUser().getIntra().equals(blockUser)) {
+                userConnectBlockUserRepository.delete(block);
             }
-        } catch (Exception e) {
-            log.info("delete: " + e.getMessage());
-            throw new ResponseStatusException(BAD_REQUEST, "차단을 해제할 수 없습니다.");
         }
 
-        throw new ResponseStatusException(NOT_FOUND, "해당 유저를 차단하고 있지 않습니다.");
+        return getUserResponse(_user);
     }
 
     public UserInterestResponse getInterests(Long userId) {

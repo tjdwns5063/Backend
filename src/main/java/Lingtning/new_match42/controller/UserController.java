@@ -74,7 +74,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "차단 유저 추가 완료")
     })
     public UserResponse addBlockUser(Authentication authentication, @RequestParam String blockUser) {
-        User user = userService.getUser(authentication);
+//        User user = userService.getUser(authentication);
+        User user = (User) authentication.getPrincipal();
         return userService.addBlockUser(user, blockUser);
     }
 
@@ -83,7 +84,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "차단 유저 삭제 완료")
     })
     public UserResponse deleteBlockUser(Authentication authentication, @RequestParam String blockUser) {
-        User user = userService.getUser(authentication);
+//        User user = userService.getUser(authentication);
+        User user = (User) authentication.getPrincipal();
+
         return userService.deleteBlockUser(user, blockUser);
     }
 
