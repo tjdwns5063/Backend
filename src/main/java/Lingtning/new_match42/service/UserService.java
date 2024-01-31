@@ -178,12 +178,12 @@ public class UserService {
         user = userRepository.findById(user.getId())
                 .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "유저를 찾을 수 없습니다"));
 
-//        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
-//        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
-//            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
-//                throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
-//            }
-//        }
+        List<UserConnectBlockUser> connectBlockUserList = userConnectBlockUserRepository.findByUser_Id(user.getId());
+        for (UserConnectBlockUser connectBlockUser : connectBlockUserList) {
+            if (connectBlockUser.getBlockUser().getIntra().equals(blockUser)) {
+                throw new ResponseStatusException(BAD_REQUEST, "이미 차단된 유저입니다.");
+            }
+        }
 
         if (user.getBlockCount() == 5) {
             throw new ResponseStatusException(BAD_REQUEST, "차단할 수 있는 유저는 최대 5명까지입니다.");
@@ -210,6 +210,7 @@ public class UserService {
 
     public UserResponse deleteBlockUser(User user, String blockUser) {
         User _user = userRepository.findById(user.getId()).orElseThrow();
+
         List<UserConnectBlockUser> blockUsers = userConnectBlockUserRepository.findByUser_Id(user.getId());
 
         for (UserConnectBlockUser block: blockUsers) {
