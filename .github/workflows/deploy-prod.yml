@@ -43,8 +43,8 @@ jobs:
       - name: Copy Application-Properties
         run: |
           mkdir -p src/main/resources
-          cp match-42-secret/application.yml src/main/resources/application.yml
-          cp match-42-secret/firebase-adminsdk.json src/main/resources/firebase-adminsdk.json
+          cp match42-secret/application.yml src/main/resources/application.yml
+          cp match42-secret/firebase-adminsdk.json src/main/resources/firebase-adminsdk.json
 
 
       - name: Build Gradle
